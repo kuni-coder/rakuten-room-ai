@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤖 AIエージェントチーム | こだわりパパ</title>
+<style>
+:root {
+  --bg: #0d0d14;
+  --card: #16161f;
+  --card2: #1e1e2a;
+  --border: #2c2c3e;
+  --accent: #7c6fff;
+  --accent2: #ff6b9d;
+  --accent3: #4ecdc4;
+  --text: #dde0f0;
+  --muted: #7a7a99;
+  --success: #56e39f;
+  --warn: #ffbe0b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, 'Hiragino Sans', 'YuGothic', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+/* ── ヘッダー ── */
+.header {
+  background: linear-gradient(135deg, #1a0533 0%, #0d1a33 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.header-title { font-size: 1.3rem; font-weight: 700; letter-spacing: .04em; }
+.header-title span { color: var(--accent); }
+.api-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex: 1;
+  min-width: 260px;
+  max-width: 480px;
+}
+.api-row input {
+  flex: 1;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 8px 12px;
+  font-size: .85rem;
+  font-family: monospace;
+}
+.btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: .85rem;
+  font-weight: 600;
+  transition: opacity .2s;
+  white-space: nowrap;
+}
+.btn:hover { opacity: .85; }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn-sm { padding: 5px 10px; font-size: .78rem; }
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+}
+.btn-outline:hover { background: var(--accent); color: #fff; }
+.btn-success { background: var(--success); color: #000; }
+.badge-saved {
+  font-size: .75rem;
+  color: var(--success);
+  display: none;
+}
+.api-saved-row {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  font-size: .82rem;
+  color: var(--success);
+}
+.api-saved-row .change-link {
+  color: var(--muted);
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: .75rem;
+}
+.api-saved-row .change-link:hover { color: var(--text); }
+.input-save-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.input-save-row input, .input-save-row textarea {
+  flex: 1;
+}
+.saved-dot {
+  font-size: .7rem;
+  color: var(--success);
+  display: none;
+  white-space: nowrap;
+}
+/* ── メイン ── */
+.main { max-width: 1280px; margin: 0 auto; padding: 24px 16px 60px; }
+.section-title {
+  font-size: .7rem;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+  margin-top: 32px;
+}
+/* ── エージェントグリッド ── */
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 16px;
+}
+.agent-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color .2s;
+}
+.agent-card:hover { border-color: var(--accent); }
+.agent-card.running { border-color: var(--warn); }
+.agent-card.done { border-color: var(--success); }
+.agent-head {
+  padding: 14px 16px 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.agent-emoji {
+  font-size: 1.8rem;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card2);
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.agent-info h3 { font-size: .95rem; font-weight: 700; }
+.agent-info p { font-size: .75rem; color: var(--muted); margin-top: 2px; }
+.agent-role {
+  margin-left: auto;
+  font-size: .68rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--accent);
+  border-radius: 20px;
+  padding: 2px 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.agent-body { padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+.agent-body label { font-size: .75rem; color: var(--muted); display: block; margin-bottom: 4px; }
+.agent-body textarea, .agent-body select, .agent-body input[type=text] {
+  width: 100%;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 8px 10px;
+  font-size: .82rem;
+  font-family: inherit;
+  resize: vertical;
+}
+.agent-body select option { background: #222; }
+.agent-footer {
+  padding: 0 16px 14px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.agent-status {
+  font-size: .72rem;
+  color: var(--muted);
+  flex: 1;
+}
+.agent-status.running { color: var(--warn); }
+.agent-status.done { color: var(--success); }
+/* ── 出力エリア ── */
+.output-area {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px;
+  min-height: 80px;
+  font-size: .82rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.7;
+  display: none;
+}
+.output-area.visible { display: block; }
+/* ── オーケストレーター ── */
+.orchestrator {
+  background: linear-gradient(135deg, var(--card) 0%, #1a1030 100%);
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+.orchestrator h2 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+.orchestrator p { font-size: .82rem; color: var(--muted); margin-bottom: 16px; }
+.orchestrator-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.orchestrator-controls input {
+  flex: 1;
+  min-width: 200px;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 9px 12px;
+  font-size: .85rem;
+}
+/* ── 統合結果 ── */
+.result-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  display: none;
+}
+.result-panel.visible { display: block; }
+.result-panel-head {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.result-panel-head h3 { font-size: .9rem; font-weight: 700; }
+.result-content { padding: 16px; font-size: .84rem; white-space: pre-wrap; line-height: 1.8; }
+/* ── ローディング ── */
+.spinner {
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin .6s linear infinite;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+/* ── フッター ── */
+.footer {
+  text-align: center;
+  padding: 20px;
+  color: var(--muted);
+  font-size: .72rem;
+  border-top: 1px solid var(--border);
+}
+@media (max-width: 600px) {
+  .agents-grid { grid-template-columns: 1fr; }
+}
+/* ── 履歴パネル ── */
+.history-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 16px;
+  font-size: .82rem;
+}
+.history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}
+.history-header h3 { font-size: .88rem; font-weight: 700; }
+.history-list { margin-top: 12px; }
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+.history-item:last-child { border-bottom: none; }
+.history-date { font-size: .72rem; color: var(--muted); white-space: nowrap; }
+.history-keyword { flex: 1; }
+</style>
+</head>
+<body>
+
+<!-- ヘッダー -->
+<div class="header">
+  <div class="header-title">🤖 AI<span>エージェントチーム</span></div>
+  <div class="api-row" id="apiInputRow">
+    <input type="password" id="apiKey" placeholder="Claude API Key (sk-ant-...)" />
+    <button class="btn btn-sm" onclick="saveKey()">保存</button>
+  </div>
+  <div class="api-saved-row" id="apiSavedRow">
+    <span>🔑 APIキー設定済み ✓</span>
+    <span class="change-link" onclick="changeKey()">変更する</span>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- オーケストレーター -->
+  <div class="orchestrator">
+    <h2>🎯 オーケストレーター（全体指揮）</h2>
+    <p>キーワードを入力して「全エージェント起動」を押すと、全エージェントが連携して1日分の投稿コンテンツを一括生成します。</p>
+    <div class="orchestrator-controls">
+      <input type="text" id="masterInput" placeholder="例：アウトドア・キャンプ用品、今日（月曜）" oninput="saveMasterInput()" />
+      <button class="btn" id="masterBtn" onclick="runAllAgents()">🚀 全エージェント起動</button>
+      <button class="btn btn-outline btn-sm" style="background:#1e1e2a;border-color:#4ecdc4;color:#4ecdc4" onclick="runSimulation()">🔬 シミュレーション</button>
+      <button class="btn btn-outline btn-sm" onclick="clearAll()">クリア</button>
+    </div>
+  </div>
+
+  <!-- 過去投稿履歴 -->
+  <div class="history-header" onclick="toggleHistory()" style="margin-bottom:8px">
+    <div style="font-size:.7rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:32px">
+      📚 過去投稿履歴 <span id="historyCount" style="color:var(--accent)"></span>
+    </div>
+    <span id="historyToggle" style="color:var(--muted);font-size:.8rem;margin-top:32px">▼</span>
+  </div>
+  <div class="history-panel" id="historyPanel" style="display:none">
+    <div class="history-list" id="historyList">
+      <span style="color:var(--muted)">まだ投稿履歴がありません</span>
+    </div>
+    <button class="btn btn-outline btn-sm" style="margin-top:12px" onclick="clearHistory()">履歴をリセット</button>
+  </div>
+
+  <!-- エージェントグリッド -->
+  <div class="section-title">⚡ 専門エージェント（個別実行も可能）</div>
+
+  <div class="agents-grid" id="agentsGrid">
+
+    <!-- Agent 1: リサーチャー -->
+    <div class="agent-card" id="card-0">
+      <div class="agent-head">
+        <div class="agent-emoji">🔍</div>
+        <div class="agent-info">
+          <h3>Riku（商品リサーチャー）</h3>
+          <p>楽天で売れそうな商品をリサーチ</p>
+        </div>
+        <span class="agent-role">リサーチ</span>
+      </div>
+      <div class="agent-body">
+        <div>
+          <label>カテゴリ・キーワード</label>
+          <div class="input-save-row">
+            <input type="text" id="in-0" placeholder="例：アウトドア、ガジェット、筋トレ" />
+            <button class="btn btn-outline btn-sm" onclick="saveInput(0)">保存</button>
+            <span class="saved-dot" id="saved-0">✓</span>
+          </div>
+        </div>
+        <div>
+          <label>出力結果</label>
+          <div class="output-area" id="out-0"></div>
+        </div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-0"></span>
+        <button class="btn btn-outline btn-sm" onclick="copyOutput(0,this)">コピー</button>
+        <button class="btn btn-sm" onclick="runAgent(0)">実行</button>
+      </div>
+    </div>
+
+    <!-- Agent 2: X投稿ライター -->
+    <div class="agent-card" id="card-1">
+      <div class="agent-head">
+        <div class="agent-emoji">✍️</div>
+        <div class="agent-info">
+          <h3>Kōki（X投稿ライター）</h3>
+          <p>こだわりパパキャラでX投稿文を生成</p>
+        </div>
+        <span class="agent-role" style="background:var(--accent2)">X投稿</span>
+      </div>
+      <div class="agent-body">
+        <div>
+          <label>商品名・価格（例：YETI クーラーボックス 15,800円）</label>
+          <div class="input-save-row">
+            <input type="text" id="in-1" placeholder="商品名 価格" />
+            <button class="btn btn-outline btn-sm" onclick="saveInput(1)">保存</button>
+            <span class="saved-dot" id="saved-1">✓</span>
+          </div>
+        </div>
+        <div>
+          <label>出力結果</label>
+          <div class="output-area" id="out-1"></div>
+        </div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-1"></span>
+        <button class="btn btn-outline btn-sm" onclick="copyOutput(1,this)">コピー</button>
+        <button class="btn btn-sm" onclick="runAgent(1)">実行</button>
+      </div>
+    </div>
+
+    <!-- Agent 3: 楽天ROOMキュレーター -->
+    <div class="agent-card" id="card-2">
+      <div class="agent-head">
+        <div class="agent-emoji">🏠</div>
+        <div class="agent-info">
+          <h3>Mimi（ROOMキュレーター）</h3>
+          <p>楽天ROOM投稿フォーマット一式を生成</p>
+        </div>
+        <span class="agent-role" style="background:#e91e8c">ROOM</span>
+      </div>
+      <div class="agent-body">
+        <div>
+          <label>商品名・カテゴリ</label>
+          <div class="input-save-row">
+            <input type="text" id="in-2" placeholder="例：スタンレー水筒 アウトドア" />
+            <button class="btn btn-outline btn-sm" onclick="saveInput(2)">保存</button>
+            <span class="saved-dot" id="saved-2">✓</span>
+          </div>
+        </div>
+        <div>
+          <label>楽天商品URL（省略可・ない場合は自動生成）</label>
+          <input type="text" id="url-2" placeholder="https://item.rakuten.co.jp/..." style="font-size:.78rem" />
+        </div>
+        <div>
+          <label>投稿パターン</label>
+          <select id="pattern-2">
+            <option value="A">パターンA（旦那視点）</option>
+            <option value="B">パターンB（奥さん視点）</option>
+            <option value="C">パターンC（夫婦共同）</option>
+          </select>
+        </div>
+        <div>
+          <label>出力結果</label>
+          <div class="output-area" id="out-2"></div>
+        </div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-2"></span>
+        <button class="btn btn-outline btn-sm" onclick="copyOutput(2,this)">コピー</button>
+        <button class="btn btn-sm" onclick="runAgent(2)">実行</button>
+      </div>
+    </div>
+
+    <!-- Agent 4: 星読みパパ -->
+    <div class="agent-card" id="card-3">
+      <div class="agent-head">
+        <div class="agent-emoji">⭐</div>
+        <div class="agent-info">
+          <h3>Hoshi（星読みパパ）</h3>
+          <p>占い×楽天アフィリ — Threads投稿文を生成</p>
+        </div>
+        <span class="agent-role" style="background:#5c35cc">Threads</span>
+      </div>
+      <div class="agent-body">
+        <div>
+          <label>開運アイテムのカテゴリ（省略可）</label>
+          <div class="input-save-row">
+            <input type="text" id="in-3" placeholder="例：筋トレグッズ、アウトドア用品（省略するとお任せ）" />
+            <button class="btn btn-outline btn-sm" onclick="saveInput(3)">保存</button>
+            <span class="saved-dot" id="saved-3">✓</span>
+          </div>
+        </div>
+        <div>
+          <label>出力結果（Threads用・500字以内）</label>
+          <div class="output-area" id="out-3"></div>
+        </div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-3"></span>
+        <button class="btn btn-outline btn-sm" onclick="copyOutput(3,this)">コピー</button>
+        <button class="btn btn-sm" onclick="runAgent(3)">実行</button>
+      </div>
+    </div>
+
+    <!-- Agent 5: 品質チェッカー -->
+    <div class="agent-card" id="card-4">
+      <div class="agent-head">
+        <div class="agent-emoji">✅</div>
+        <div class="agent-info">
+          <h3>Check（品質チェッカー）</h3>
+          <p>投稿内容を審査してフィードバック</p>
+        </div>
+        <span class="agent-role" style="background:var(--success); color:#000">審査</span>
+      </div>
+      <div class="agent-body">
+        <div>
+          <label>審査したい投稿文をここに貼り付け</label>
+          <div class="input-save-row" style="align-items:flex-start">
+            <textarea id="in-4" rows="4" placeholder="投稿文をペーストしてください..."></textarea>
+            <div style="display:flex;flex-direction:column;gap:4px;padding-top:2px">
+              <button class="btn btn-outline btn-sm" onclick="saveInput(4)">保存</button>
+              <span class="saved-dot" id="saved-4" style="text-align:center">✓</span>
+            </div>
+          </div>
+        </div>
+        <div>
+          <label>審査結果</label>
+          <div class="output-area" id="out-4"></div>
+        </div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-4"></span>
+        <button class="btn btn-outline btn-sm" onclick="copyOutput(4,this)">コピー</button>
+        <button class="btn btn-sm" onclick="runAgent(4)">実行</button>
+      </div>
+    </div>
+
+    <!-- Agent 6: 投稿プランナー -->
+    <div class="agent-card" id="card-5">
+      <div class="agent-head">
+        <div class="agent-emoji">📅</div>
+        <div class="agent-info">
+          <h3>Plan（投稿プランナー）</h3>
+          <p>1日・1週間の投稿スケジュールを立案</p>
+        </div>
+        <span class="agent-role" style="background:var(--accent3); color:#000">計画</span>
+      </div>
+      <div class="agent-body">
+        <div>
+          <label>期間・テーマ（例：今週/アウトドア中心）</label>
+          <div class="input-save-row">
+            <input type="text" id="in-5" placeholder="例：今週、ガジェット＆ファッション中心" />
+            <button class="btn btn-outline btn-sm" onclick="saveInput(5)">保存</button>
+            <span class="saved-dot" id="saved-5">✓</span>
+          </div>
+        </div>
+        <div>
+          <label>出力結果</label>
+          <div class="output-area" id="out-5"></div>
+        </div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-5"></span>
+        <button class="btn btn-outline btn-sm" onclick="copyOutput(5,this)">コピー</button>
+        <button class="btn btn-sm" onclick="runAgent(5)">実行</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 統合結果パネル -->
+  <div class="section-title" id="resultTitle" style="display:none">📋 統合結果（全エージェント）</div>
+  <div class="result-panel" id="resultPanel">
+    <div class="result-panel-head">
+      <h3>🤖 エージェントチーム 統合レポート</h3>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-outline btn-sm" onclick="copyAll()">全コピー</button>
+        <button class="btn btn-sm btn-success" onclick="exportMd()">MDで保存</button>
+      </div>
+    </div>
+    <div class="result-content" id="resultContent"></div>
+    <div id="quickCopyArea" style="padding:12px 16px;border-top:1px solid var(--border);display:none;gap:8px;flex-wrap:wrap;align-items:center">
+      <span style="font-size:.72rem;color:var(--muted);margin-right:4px">個別コピー：</span>
+      <button class="btn btn-outline btn-sm" style="border-color:var(--accent2);color:var(--accent2)" onclick="copySection('X投稿文', this)">✍️ X投稿文</button>
+      <button class="btn btn-outline btn-sm" style="border-color:#e91e8c;color:#e91e8c" onclick="copySection('楽天ROOM投稿', this)">🏠 ROOM投稿</button>
+      <button class="btn btn-outline btn-sm" style="border-color:#5c35cc;color:#a78bfa" onclick="copySection('占い投稿', this)">⭐ Threads占い</button>
+      <button class="btn btn-outline btn-sm" style="border-color:var(--accent3);color:var(--accent3)" onclick="copySection('リサーチ', this)">🔍 リサーチ</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">こだわりパパ AIエージェントチーム v1.0 ─ Powered by Claude API</div>
+
+<script>
+// ── 定数 ──
+const MODEL = 'claude-haiku-4-5-20251001';
+const API_URL = 'https://api.anthropic.com/v1/messages';
+
+// ── エージェント定義 ──
+const AGENTS = [
+  {
+    name: 'Riku（商品リサーチャー）',
+    system: `あなたは楽天市場のリサーチ専門エージェント「Riku」です。
+40代パパ・会社経営者・アウトドア/ガジェット/筋トレ/ファッション好きをターゲットにした商品をリサーチします。
+入力されたカテゴリ・キーワードに対して、楽天市場で売れそうな商品を3件提案してください。
+各商品について：商品名、特徴（1〜2行）、想定価格帯、おすすめの理由を簡潔に出力してください。
+余計な前置きは不要。すぐに提案リストを出力してください。`,
+    prompt: (input) => {
+      const history = getHistory();
+      const usedProducts = getUsedProducts();
+      const historyText = history.length > 0
+        ? `\n\n【過去に紹介済みカテゴリ（重複禁止）】\n${history.map(h => `- ${h.keyword}（${h.date}）`).join('\n')}`
+        : '';
+      const productText = usedProducts.length > 0
+        ? `\n\n【過去に紹介済み商品（これらと同じ商品は禁止）】\n${usedProducts.map(p => `- ${p}`).join('\n')}`
+        : '';
+      return `カテゴリ: ${input}${historyText}${productText}\n\nこのカテゴリで楽天市場で売れそうな商品を3件提案してください。過去に紹介済みの商品・カテゴリと重複しないようにしてください。`;
+    }
+  },
+  {
+    name: 'Kōki（X投稿ライター）',
+    system: `あなたはXの投稿文ライター「Kōki」です。
+「こだわりパパ」（40代・会社代表・2児のパパ・アウトドア/ガジェット/筋トレ/ファッション好き）の視点で投稿文を書きます。
+
+【絶対条件】
+①130字以内　②日本語で始める　③=や記号を先頭に付けない　④ハッシュタグ3つ以内　⑤URLは含めない
+
+【禁止表現】
+「おすすめ」「ぜひ」「最高」「絶対」「間違いない」「神」「必見」「要チェック」「神コスパ」
+理由：Xフォロワーは広告に敏感で、宣伝口調を感じた瞬間にスクロールされる。自分が実際に使った人間の言葉として書くこと。
+
+【文体の指針】
+・気づき・発見・失敗・驚きを起点にする。例：「これ買うまで知らなかったけど」「正直半信半疑だったんだが」「子どもに取られた時点で勝ち確だった」
+・「こだわりパパ」としての視点を出す：機能・素材・ブランド背景・長く使える理由など、選んだ根拠を一言入れる
+・感情の流れを作る：「最初→使ってみたら→今は」の3段階で短くまとめると自然に読める
+
+余計な前置きは不要。投稿文のみ出力してください。`,
+    prompt: (input) => `商品情報: ${input}\n\nこの商品のX投稿文を作成してください。`
+  },
+  {
+    name: 'Mimi（ROOMキュレーター）',
+    system: `あなたは楽天ROOMの投稿コンテンツ生成エージェント「Mimi」です。
+「大人の男のかっこいいを集めるROOM」のキャラクターで投稿コンテンツを作ります。
+
+【出力形式】
+【投稿タイトル】（20〜30文字）
+【レビュー文】（80〜140文字）
+【タグ】（7個、#付き）
+【サムネ用一言】（10〜15文字）
+【推奨投稿時間】
+【商品URL】※URLが提供されている場合はそのまま記載。ない場合は「https://search.rakuten.co.jp/search/mall/商品名/」の形式で楽天検索URLを生成
+
+【レビュー文のルール】
+・必ずデメリットを1つ含める。理由：欠点を正直に書くことで信頼感が生まれ、読者が「自分ごと」として判断しやすくなる。
+・生活場面や感情の変化・気づきを起点にして書く。例：「朝の準備が面倒だったのが〜」「子どもに取られそうになったくらい〜」
+・以下の表現は使用禁止（宣伝臭の原因となる）：「おすすめ」「ぜひ」「最高」「間違いない」「必見」「要チェック」「ぜひ手に入れて」「絶対」「神」
+・禁止の理由：フォロワーは広告を見慣れており、宣伝口調を感じた瞬間に読む気を失う。自分で使った人の言葉として書くこと。
+
+【パターン別トーン】
+パターンA（旦那視点）: 最初は半信半疑だったが実際使って納得、という感情の流れ。例：「妻に勧められて渋々買ったけど」「男目線で見ても正直これはアリ」
+パターンB（奥さん視点）: 夫や家族への軽いツッコミを交えた日常感。例：「夫がなぜかこれだけ片付ける（笑）」「見た目が可愛くて朝からテンション上がった」
+パターンC（夫婦共同）: 二人で決めた安心感とコスパの実感。例：「二人で話し合って選んで正解でした」「一緒に使うから一個でいいし、コスパも納得」`,
+    prompt: (input, extra, url) => `商品: ${input}\nパターン: ${extra || 'A'}${url ? `\n商品URL: ${url}` : ''}\n\nこの商品の楽天ROOM投稿コンテンツを生成してください。`
+  },
+  {
+    name: 'Hoshi（星読みパパ）',
+    system: `あなたは「星読みパパ」という占い師エージェントです。
+今日の日付・月の満ち欠け・数秘術・六曜を根拠にした12星座運勢ランキングをThreads投稿文として生成します。
+
+【条件】
+①500字以内（Threads向けにやや読み応えのある文量）
+②1〜3位の星座のみ、各星座に2〜3行のアドバイス
+③天体データ（月相・数秘・六曜）を根拠として冒頭に自然に組み込む
+④末尾に楽天アフィリリンク誘導の一言を入れる（「今日の開運アイテムはプロフのリンクから👇」など）
+⑤末尾ハッシュタグ：#今日の運勢 #星読みパパ #星座占い #Threads
+⑥先頭に記号・絵文字は使わない
+⑦投稿文のみ出力、余計な前置き不要
+
+【文体】
+Xより少しゆったりした読み口。「今日はこういう日だから、こう動くといい」という具体的な行動提案を入れる。`,
+    prompt: (input) => {
+      const now = new Date();
+      const y = now.getFullYear(), m = now.getMonth()+1, d = now.getDate();
+      let num = (y+m+d).toString().split('').reduce((a,b)=>a+parseInt(b),0);
+      while(num>9) num=num.toString().split('').reduce((a,b)=>a+parseInt(b),0);
+      const moon = ['大安','赤口','先勝','友引','先負','仏滅'][(y*12+m+d)%6];
+      const moonPhase = (() => {
+        const ref = new Date(2026,2,29); const diff = (now-ref)/(86400000)%29.53;
+        const v = diff<0?diff+29.53:diff;
+        if(v<1.5) return '新月🌑'; if(v<7.4) return '三日月🌒'; if(v<9) return '上弦🌓';
+        if(v<14.8) return '十三夜🌔'; if(v<16.5) return '満月🌕'; if(v<22.1) return '十六夜🌖';
+        if(v<23.5) return '下弦🌗'; return '晦日月🌘';
+      })();
+      const item = input || '開運アイテム';
+      return `今日(${y}/${m}/${d})のThreads占い投稿を作成。月：${moonPhase}、数秘：${num}、六曜：${moon}。アフィリリンク誘導用商品カテゴリ：${item}。上記データを根拠にした今日の12星座ランキング投稿文（1〜3位のみ）をThreads向けに作成してください。`;
+    }
+  },
+  {
+    name: 'Check（品質チェッカー）',
+    system: `あなたは楽天ROOMとX、Threadsの投稿コンテンツ審査エージェント「Check」です。
+以下の基準で審査し、OK/NGを判定してフィードバックしてください：
+【審査基準】
+- 文字数が適切か（X: 130字以内、ROOM: 80〜140字、Threads: 500字以内）
+- 煽り・誇大表現がないか（「絶対」「最高」「神」などNG）
+- 宣伝っぽい表現がないか
+- 自然な語り口か
+- デメリットが含まれているか（ROOMの場合）
+- ハッシュタグが適切か（X: 3個以内、Threads: 5個以内）
+- 先頭が=や記号で始まっていないか
+- Threads投稿の場合：楽天リンク誘導の一言が含まれているか
+出力形式：【判定】OK or NG、【理由】箇条書き、【改善案】（NGの場合のみ）`,
+    prompt: (input) => `以下の投稿文を審査してください：\n\n${input}`
+  },
+  {
+    name: 'Plan（投稿プランナー）',
+    system: `あなたは投稿スケジュール管理エージェント「Plan」です。
+楽天ROOMとXの投稿計画を立案します。
+1日5投稿（間隔2時間以上）・毎回カテゴリを変える・過去商品の重複禁止のルールに従います。
+時間帯別設定：
+- 朝6〜9時：ガジェット・ファッション系／旦那視点
+- 昼12〜13時：グルメ・コスメ系／奥さん視点
+- 午後15〜16時：インテリア・家電系／夫婦共同
+- 夕方18〜20時：スポーツ・趣味系／旦那視点
+- 夜21〜23時：寝具・美容・癒し系／夫婦共同
+入力された期間・テーマに合わせて具体的な投稿計画表を作成してください。`,
+    prompt: (input) => {
+      const history = getHistory();
+      const historyText = history.length > 0
+        ? `\n\n【過去に紹介済み（重複禁止）】\n${history.map(h => `- ${h.keyword}（${h.date}）`).join('\n')}`
+        : '';
+      return `期間・テーマ: ${input}${historyText}\n\nこの条件で楽天ROOMとXの投稿スケジュール計画を作成してください。過去に紹介済みの商品と重複しない新しいカテゴリ・商品を選んでください。`;
+    }
+  }
+];
+
+// ── 起動時復元 ──
+window.onload = () => {
+  // APIキー復元（sessionStorage：ブラウザタブを閉じると自動削除）
+  const savedKey = sessionStorage.getItem('claude_api_key');
+  if (savedKey) {
+    document.getElementById('apiKey').value = savedKey;
+    showApiSaved();
+  }
+  // マスター入力復元
+  const savedMaster = localStorage.getItem('master_input');
+  if (savedMaster) document.getElementById('masterInput').value = savedMaster;
+  // エージェント入力欄の復元
+  for (let i = 0; i <= 5; i++) {
+    const val = localStorage.getItem(`agent_input_${i}`);
+    if (val) {
+      const el = document.getElementById(`in-${i}`);
+      if (el) el.value = val;
+    }
+  }
+  // 生成済み出力の復元
+  for (let i = 0; i <= 5; i++) {
+    const out = localStorage.getItem(`agent_output_${i}`);
+    if (out) {
+      const outEl = document.getElementById(`out-${i}`);
+      if (outEl) { outEl.textContent = out; outEl.className = 'output-area visible'; }
+      const card = document.getElementById(`card-${i}`);
+      if (card) card.className = 'agent-card done';
+      const status = document.getElementById(`status-${i}`);
+      if (status) { status.textContent = '✓ 完了（復元）'; status.className = 'agent-status done'; }
+    }
+  }
+  // 履歴の描画
+  renderHistory();
+};
+
+function saveMasterInput() {
+  const val = document.getElementById('masterInput').value;
+  localStorage.setItem('master_input', val);
+}
+
+// ── 生成結果の保存・履歴管理 ──
+function saveOutput(idx, text) {
+  localStorage.setItem(`agent_output_${idx}`, text);
+}
+
+function getHistory() {
+  try { return JSON.parse(localStorage.getItem('post_history') || '[]'); } catch { return []; }
+}
+
+// Rikuの出力から商品名を抽出
+function extractProductNames(text) {
+  if (!text) return [];
+  const names = [];
+  const patterns = [
+    /[①②③④⑤][\s　]*([^\n]{2,30})/g,
+    /^\d+[\.．、]\s*([^\n]{2,30})/gm,
+    /【商品名?】\s*([^\n]{2,30})/g,
+  ];
+  for (const re of patterns) {
+    let m;
+    while ((m = re.exec(text)) !== null) {
+      const name = m[1].trim().replace(/[（(].*/, '').trim();
+      if (name.length >= 2 && !names.includes(name)) names.push(name);
+    }
+  }
+  return names.slice(0, 5);
+}
+
+function getUsedProducts() {
+  const history = getHistory();
+  const all = [];
+  history.forEach(h => { if (h.productNames) all.push(...h.productNames); });
+  return all;
+}
+
+function addHistory(keyword, researchResult) {
+  const history = getHistory();
+  const productNames = extractProductNames(researchResult);
+  history.unshift({
+    date: new Date().toLocaleDateString('ja-JP'),
+    keyword,
+    products: researchResult || '',
+    productNames
+  });
+  if (history.length > 30) history.pop();
+  localStorage.setItem('post_history', JSON.stringify(history));
+  renderHistory();
+}
+
+function clearHistory() {
+  if (!confirm('過去投稿履歴をリセットしますか？')) return;
+  localStorage.removeItem('post_history');
+  renderHistory();
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderHistory() {
+  const history = getHistory();
+  const countEl = document.getElementById('historyCount');
+  if (countEl) countEl.textContent = history.length > 0 ? `（${history.length}件）` : '';
+  const listEl = document.getElementById('historyList');
+  if (!listEl) return;
+  if (history.length === 0) {
+    listEl.innerHTML = '<span style="color:var(--muted)">まだ投稿履歴がありません</span>';
+    return;
+  }
+  listEl.innerHTML = history.map(h =>
+    `<div class="history-item">
+      <span class="history-date">${h.date}</span>
+      <div style="flex:1">
+        <span class="history-keyword">${escapeHtml(h.keyword)}</span>
+        ${h.productNames && h.productNames.length > 0
+          ? `<div style="margin-top:3px;display:flex;flex-wrap:wrap;gap:4px">${h.productNames.map(p =>
+              `<span style="font-size:.68rem;background:var(--card2);border:1px solid var(--border);border-radius:4px;padding:1px 6px;color:var(--muted)">${escapeHtml(p)}</span>`
+            ).join('')}</div>`
+          : ''}
+      </div>
+    </div>`
+  ).join('');
+}
+
+function toggleHistory() {
+  const panel = document.getElementById('historyPanel');
+  const toggle = document.getElementById('historyToggle');
+  if (!panel) return;
+  const isHidden = panel.style.display === 'none';
+  panel.style.display = isHidden ? 'block' : 'none';
+  if (toggle) toggle.textContent = isHidden ? '▲' : '▼';
+}
+
+function showApiSaved() {
+  document.getElementById('apiInputRow').style.display = 'none';
+  document.getElementById('apiSavedRow').style.display = 'flex';
+}
+
+function saveKey() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) { alert('APIキーを入力してください'); return; }
+  sessionStorage.setItem('claude_api_key', key);
+  showApiSaved();
+}
+
+function changeKey() {
+  document.getElementById('apiInputRow').style.display = 'flex';
+  document.getElementById('apiSavedRow').style.display = 'none';
+  document.getElementById('apiKey').focus();
+}
+
+function getKey() {
+  return document.getElementById('apiKey').value.trim() || sessionStorage.getItem('claude_api_key') || '';
+}
+
+// ── エージェント入力保存 ──
+function saveInput(idx) {
+  const el = document.getElementById(`in-${idx}`);
+  if (!el) return;
+  const val = el.value.trim();
+  if (!val) return;
+  localStorage.setItem(`agent_input_${idx}`, val);
+  const dot = document.getElementById(`saved-${idx}`);
+  if (dot) {
+    dot.style.display = 'inline';
+    setTimeout(() => dot.style.display = 'none', 2000);
+  }
+}
+
+// ── Claude API呼び出し（最大3回リトライ）──
+async function callClaude(system, userMsg, retryCount = 0) {
+  const key = getKey();
+  if (!key) throw new Error('APIキーが設定されていません');
+  const MAX_RETRY = 2;
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 1024,
+        system: system,
+        messages: [{ role: 'user', content: userMsg }]
+      })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      const status = res.status;
+      if ((status === 429 || status >= 500) && retryCount < MAX_RETRY) {
+        const wait = (retryCount + 1) * 1000;
+        await new Promise(r => setTimeout(r, wait));
+        return callClaude(system, userMsg, retryCount + 1);
+      }
+      throw new Error(err.error?.message || `HTTP ${status}`);
+    }
+    const data = await res.json();
+    return data.content[0].text;
+  } catch(e) {
+    if (retryCount < MAX_RETRY && !(e.message.includes('APIキー'))) {
+      await new Promise(r => setTimeout(r, (retryCount + 1) * 1000));
+      return callClaude(system, userMsg, retryCount + 1);
+    }
+    throw e;
+  }
+}
+
+// ── 個別エージェント実行 ──
+async function runAgent(idx) {
+  const key = getKey();
+  if (!key) { alert('APIキーを入力してください'); return; }
+
+  const agent = AGENTS[idx];
+  const card = document.getElementById(`card-${idx}`);
+  const statusEl = document.getElementById(`status-${idx}`);
+  const outEl = document.getElementById(`out-${idx}`);
+  const inEl = document.getElementById(`in-${idx}`);
+  const input = inEl ? inEl.value.trim() : '';
+
+  // パターン取得（Agent 2のみ）
+  const patternEl = document.getElementById('pattern-2');
+  const extra = (idx === 2 && patternEl) ? patternEl.value : '';
+
+  // 商品URL取得（Agent 2のみ）
+  const urlEl = document.getElementById('url-2');
+  const productUrl = (idx === 2 && urlEl) ? urlEl.value.trim() : '';
+
+  // 実行中はボタンを無効化
+  const footerBtns = card.querySelectorAll('.agent-footer .btn');
+  const runBtn = footerBtns[footerBtns.length - 1];
+  if (runBtn) runBtn.disabled = true;
+
+  card.className = 'agent-card running';
+  statusEl.className = 'agent-status running';
+  statusEl.innerHTML = '<span class="spinner"></span>生成中...';
+  outEl.className = 'output-area visible';
+  outEl.textContent = '生成中...';
+
+  try {
+    const prompt = agent.prompt(input || '（テーマはお任せ）', extra, productUrl);
+    const result = await callClaude(agent.system, prompt);
+    outEl.textContent = result;
+    saveOutput(idx, result);
+    card.className = 'agent-card done';
+    statusEl.className = 'agent-status done';
+    statusEl.textContent = '✓ 完了';
+    return result;
+  } catch(e) {
+    outEl.textContent = '⚠️ エラー: ' + e.message;
+    card.className = 'agent-card';
+    statusEl.className = 'agent-status';
+    statusEl.textContent = 'エラー発生';
+    throw e;
+  } finally {
+    if (runBtn) runBtn.disabled = false;
+  }
+}
+
+// ── 全エージェント起動 ──
+async function runAllAgents() {
+  const key = getKey();
+  if (!key) { alert('APIキーを入力してください'); return; }
+
+  const masterInput = document.getElementById('masterInput').value.trim();
+  const btn = document.getElementById('masterBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>実行中...';
+
+  try {
+    // マスター入力をエージェントに配布
+    const keywords = masterInput || 'アウトドア・ガジェット';
+    document.getElementById('in-0').value = keywords;
+    document.getElementById('in-1').value = keywords;
+    document.getElementById('in-2').value = keywords;
+    document.getElementById('in-3').value = keywords;
+    document.getElementById('in-5').value = keywords + ' 今週分';
+
+    // Step1: リサーチ・X投稿・ROOM・占い・プランを並列実行
+    const results = [];
+    await Promise.all([0, 1, 2, 3, 5].map(async (idx) => {
+      try { results[idx] = await runAgent(idx); }
+      catch(e) { results[idx] = '⚠️ エラー: ' + e.message; }
+    }));
+
+    // Step2: CheckエージェントにX投稿文とROOM投稿文を渡して審査
+    const checkInput = [
+      results[1] ? `【X投稿文】\n${results[1]}` : '',
+      results[2] ? `【楽天ROOM投稿】\n${results[2]}` : ''
+    ].filter(Boolean).join('\n\n');
+
+    if (checkInput) {
+      document.getElementById('in-4').value = checkInput;
+      try { results[4] = await runAgent(4); }
+      catch(e) { results[4] = '⚠️ 審査エラー: ' + e.message; }
+    }
+
+    // 統合レポート生成
+    showResultPanel(keywords, results);
+
+    // 履歴に保存
+    addHistory(keywords, results[0]);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🚀 全エージェント起動';
+  }
+}
+
+function showResultPanel(keyword, results) {
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  const names = ['🔍 商品リサーチ（Riku）', '✍️ X投稿文（Kōki）', '🏠 楽天ROOM投稿（Mimi）', '⭐ 占い投稿（Hoshi）', '✅ 品質審査（Check）', '📅 投稿プラン（Plan）'];
+
+  let text = `# エージェントチーム 統合レポート\n生成日時：${dateStr} | テーマ：${keyword}\n\n`;
+  [0,1,2,3,5,4].forEach(idx => {
+    text += `${'─'.repeat(40)}\n${names[idx]}\n${'─'.repeat(40)}\n`;
+    text += (results[idx] || '（未実行）') + '\n\n';
+  });
+
+  document.getElementById('resultContent').textContent = text;
+  const panel = document.getElementById('resultPanel');
+  panel.className = 'result-panel visible';
+  document.getElementById('resultTitle').style.display = 'block';
+  // 個別コピーエリア表示
+  const qc = document.getElementById('quickCopyArea');
+  if (qc) qc.style.display = 'flex';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── コピー・エクスポート ──
+function copyOutput(idx, btn) {
+  const text = document.getElementById(`out-${idx}`).textContent;
+  if (!text || text === '生成中...') return;
+  navigator.clipboard.writeText(text).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ 済';
+    setTimeout(() => btn.textContent = orig, 1500);
+  }).catch(() => {
+    alert('コピーに失敗しました。手動で選択してください。');
+  });
+}
+
+function copyAll() {
+  const text = document.getElementById('resultContent').textContent;
+  navigator.clipboard.writeText(text)
+    .then(() => alert('クリップボードにコピーしました'))
+    .catch(() => alert('コピーに失敗しました。手動で選択してください。'));
+}
+
+// 個別セクションコピー（統合レポートから該当部分を抽出）
+function copySection(label, btn) {
+  const text = document.getElementById('resultContent').textContent;
+  // セクション名を含む区切り行を探して次の区切りまで抽出
+  const lines = text.split('
+');
+  let capture = false;
+  let extracted = [];
+  for (const line of lines) {
+    if (!capture && line.includes(label)) { capture = true; continue; }
+    if (capture) {
+      if (line.startsWith('─'.repeat(10))) break;
+      extracted.push(line);
+    }
+  }
+  const result = extracted.join('
+').trim();
+  if (!result) { alert('該当セクションが見つかりません。先に全エージェントを実行してください。'); return; }
+  navigator.clipboard.writeText(result).then(() => {
+    const orig = btn.textContent;
+    btn.textContent = '✓ コピー済';
+    setTimeout(() => btn.textContent = orig, 1500);
+  }).catch(() => alert('コピーに失敗しました。'));
+}
+
+function exportMd() {
+  const text = document.getElementById('resultContent').textContent;
+  const now = new Date();
+  const fname = `agent-report-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.md`;
+  const blob = new Blob([text], { type: 'text/markdown' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fname;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+// ── シミュレーション実行（APIなし・モックデータ）──
+const MOCK_DATA = {
+  keyword: 'キャンプ用品',
+  results: [
+    // [0] Riku: リサーチ
+    `【提案商品】キャンプ用品 おすすめ3選
+
+① コールマン ツーリングドームST
+特徴：ソロ〜2人用の軽量テント。設営10分・収納袋付き。
+想定価格：15,000〜20,000円
+理由：初心者にも扱いやすく、楽天でもレビュー多数の定番品。
+
+② SOTO ウインドマスター（ガスバーナー）
+特徴：強風でも安定した火力を維持できる4本ゴトク仕様。
+想定価格：8,000〜10,000円
+理由：ソロキャンパーに特に人気。コンパクトで機能性抜群。
+
+③ snow peak チタンシングルマグ450
+特徴：超軽量チタン製。直火OK・保温性高い。
+想定価格：3,500〜4,500円
+理由：ミニマルキャンプ派に根強い人気。プレゼントにも最適。`,
+
+    // [1] Kōki: X投稿文
+    `ソロキャンプを始めて3年。道具にこだわりすぎた時期もあったけど、結局使い続けてるのはシンプルで信頼性の高いものだけ。コールマンのテントとSOTOのバーナーがあれば、どこでも「自分の場所」が作れる。道具は少なく、体験は深く。 #キャンプ #ソロキャンプ #こだわり装備`,
+
+    // [2] Mimi: ROOM投稿
+    `【投稿タイトル】
+40代パパが選んだソロキャンプの相棒3選
+
+【レビュー文】
+妻に「また増えてる（笑）」と言われながらも手放せないキャンプギア。コールマンのテントは設営が速くて子どもと行くときも楽。ただ、夏場は少し蒸れるのが気になるところ。SOTOのバーナーは強風でも火が消えないのが最高で、これだけは絶対に手放せない。
+
+【タグ】
+#キャンプギア #ソロキャンプ #コールマン #SOTO #アウトドア好きパパ #キャンプ飯 #楽天ROOM
+
+【サムネ用一言】
+パパの秘密基地装備
+
+【推奨投稿時間】
+夕方18:00〜20:00（スポーツ・趣味系の時間帯）`,
+
+    // [3] Hoshi: 占い投稿
+    `上弦🌓×数秘4の日（安定・努力の日）
+
+🥇 牡牛座：地道な行動が実を結ぶ。今日の準備が来週の成果に直結
+🥈 山羊座：責任感が運気を押し上げる。コツコツが吉
+🥉 乙女座：細部への注意力が冴える一日。買い物の目利きも◎
+
+今日の開運アイテム👇
+アウトドアギアで自然と繋がる日。心が整う道具を手に入れて。
+
+#今日の運勢 #星読みパパ #星座占い`,
+
+    // [4] Check: 審査（X投稿文とROOM投稿を審査）
+    `【判定】X投稿文：OK ／ 楽天ROOM投稿：OK
+
+【理由】
+X投稿文
+・文字数：約120字（130字以内 ✓）
+・先頭が日本語で始まっている ✓
+・ハッシュタグ3つ ✓
+・URLなし ✓
+・誇大表現なし（「最高」は使われているが文脈上自然） ✓
+
+楽天ROOM投稿
+・レビュー文：約130字（80〜140字の範囲 ✓）
+・デメリット記載あり（「夏場は少し蒸れる」） ✓
+・宣伝臭がなく自然な語り口 ✓
+・タグ7個 ✓
+・サムネ用一言：10字 ✓`,
+
+    // [5] Plan: 投稿プラン
+    `📅 キャンプ用品テーマ 今週の投稿計画
+
+月曜（ガジェット・ファッション系 ／ 旦那視点）
+  06:30 → コールマン テントのX投稿＋ROOM投稿
+
+火曜（グルメ・コスメ系 ／ 奥さん視点）
+  12:00 → キャンプ飯グッズのX投稿＋ROOM投稿
+
+水曜（インテリア・家電系 ／ 夫婦共同）
+  15:30 → テーブル・チェアのX投稿＋ROOM投稿
+
+木曜（スポーツ・趣味系 ／ 旦那視点）
+  19:00 → SOTOバーナーのX投稿＋ROOM投稿
+
+金曜（寝具・美容・癒し系 ／ 夫婦共同）
+  22:00 → シュラフ・寝具のX投稿＋ROOM投稿
+
+※各投稿間隔2時間以上 ✓  ※カテゴリ重複なし ✓`
+  ]
+};
+
+async function runSimulation() {
+  const keyword = document.getElementById('masterInput').value.trim() || 'キャンプ用品';
+  const btn = document.querySelector('[onclick="runSimulation()"]');
+  btn.disabled = true;
+  btn.textContent = '⏳ 実行中...';
+
+  // 各エージェントカードにモックデータを順番に表示（50ms間隔でアニメーション）
+  const labels = ['in-0','in-1','in-2','in-3','in-5','in-4'];
+  const inputs = [keyword, keyword, keyword, keyword, keyword + ' 今週分', '（X投稿文＋ROOM投稿を自動受け取り）'];
+  labels.forEach((id, i) => {
+    const el = document.getElementById(id);
+    if (el) el.value = inputs[i];
+  });
+
+  const order = [0,1,2,3,5,4]; // Checkは最後
+  for (const idx of order) {
+    const card = document.getElementById(`card-${idx}`);
+    const statusEl = document.getElementById(`status-${idx}`);
+    const outEl = document.getElementById(`out-${idx}`);
+    card.className = 'agent-card running';
+    statusEl.className = 'agent-status running';
+    statusEl.innerHTML = '<span class="spinner"></span>生成中...';
+    outEl.className = 'output-area visible';
+    outEl.textContent = '生成中...';
+    await new Promise(r => setTimeout(r, 400));
+    outEl.textContent = MOCK_DATA.results[idx];
+    saveOutput(idx, MOCK_DATA.results[idx]);
+    card.className = 'agent-card done';
+    statusEl.className = 'agent-status done';
+    statusEl.textContent = '✓ 完了（シミュレーション）';
+  }
+
+  showResultPanel(keyword + '（シミュレーション）', MOCK_DATA.results);
+  btn.disabled = false;
+  btn.textContent = '🔬 シミュレーション';
+}
+
+function clearAll() {
+  // 出力・ステータスのみクリア（保存済み入力・履歴は維持）
+  for (let i = 0; i < 6; i++) {
+    const out = document.getElementById(`out-${i}`);
+    if (out) { out.textContent = ''; out.className = 'output-area'; }
+    const status = document.getElementById(`status-${i}`);
+    if (status) { status.textContent = ''; status.className = 'agent-status'; }
+    const card = document.getElementById(`card-${i}`);
+    if (card) card.className = 'agent-card';
+    localStorage.removeItem(`agent_output_${i}`);
+  }
+  document.getElementById('resultPanel').className = 'result-panel';
+  const qc = document.getElementById('quickCopyArea');
+  if (qc) qc.style.display = 'none';
+  document.getElementById('resultTitle').style.display = 'none';
+}
+</script>
+</body>
+</html>
