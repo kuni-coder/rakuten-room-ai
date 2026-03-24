@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤖 楽天ROOM AIエージェントチーム | こだわりパパ</title>
+<style>
+:root {
+  --bg: #0a0a0a;
+  --card: #1a1a1a;
+  --card-hover: #252525;
+  --border: #333;
+  --accent: #00a652;
+  --accent-hover: #008f47;
+  --accent2: #ff6b35;
+  --accent3: #4a90e2;
+  --text: #ffffff;
+  --text-muted: #888;
+  --success: #28a745;
+  --warning: #ffc107;
+  --danger: #dc3545;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', 'YuGothic', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.header {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-bottom: 2px solid var(--accent);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-title .emoji { font-size: 1.8rem; }
+.header-title .brand { color: var(--accent); }
+
+.api-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.api-input {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-family: monospace;
+  min-width: 300px;
+}
+
+.btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+}
+
+.btn-outline:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-danger { background: var(--danger); }
+.btn-danger:hover { background: #c82333; }
+
+.status-saved {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  color: var(--success);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+.orchestrator {
+  background: linear-gradient(135deg, var(--card) 0%, #2a2a2a 100%);
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 32px rgba(0, 166, 82, 0.1);
+}
+
+.orchestrator h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.orchestrator p {
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.orchestrator-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.orchestrator-controls input {
+  flex: 1;
+  min-width: 250px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 12px 16px;
+  font-size: 0.95rem;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 32px 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+}
+
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 20px;
+}
+
+.agent-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.agent-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 32px rgba(0, 166, 82, 0.15);
+}
+
+.agent-card.running {
+  border-color: var(--warning);
+  box-shadow: 0 8px 32px rgba(255, 193, 7, 0.2);
+}
+
+.agent-card.success {
+  border-color: var(--success);
+  box-shadow: 0 8px 32px rgba(40, 167, 69, 0.2);
+}
+
+.agent-header {
+  background: linear-gradient(135deg, var(--card-hover) 0%, #333 100%);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.agent-emoji {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.agent-info h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.agent-info p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.agent-role {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  background: var(--accent2);
+  border-radius: 20px;
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
+.agent-body {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.agent-body label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.agent-body input,
+.agent-body select,
+.agent-body textarea {
+  width: 100%;
+  background: var(--card-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.output-area {
+  background: var(--card-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 100px;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+  display: none;
+  font-family: 'SF Mono', monospace;
+}
+
+.output-area.visible { display: block; }
+
+.agent-footer {
+  padding: 16px 20px;
+  background: var(--card-hover);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.agent-status {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.agent-status.running {
+  color: var(--warning);
+  font-weight: 600;
+}
+
+.agent-status.success {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.result-panel {
+  background: var(--card);
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 32px;
+  display: none;
+}
+
+.result-panel h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.result-content {
+  background: var(--card-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  white-space: pre-wrap;
+  font-family: 'SF Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.quick-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.footer {
+  text-align: center;
+  padding: 32px 24px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--border);
+  margin-top: 48px;
+}
+
+@media (max-width: 768px) {
+  .agents-grid { grid-template-columns: 1fr; }
+  .header { padding: 16px; }
+  .orchestrator { padding: 20px; }
+  .api-section { width: 100%; }
+  .api-input { min-width: auto; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">
+    <span class="emoji">🤖</span>
+    <span>楽天ROOM AI</span><span class="brand">エージェントチーム</span>
+  </div>
+  
+  <div class="api-section">
+    <div id="apiInputSection">
+      <input type="password" id="apiKeyInput" class="api-input" placeholder="Claude API Key (sk-ant-...)" />
+      <button class="btn" onclick="saveApiKey()">保存</button>
+    </div>
+    <div id="apiSavedSection" class="status-saved">
+      <span>✅ APIキー設定済み</span>
+      <button class="btn btn-outline" onclick="changeApiKey()">変更</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="orchestrator">
+    <h2>🎯 オーケストレーター（全体指揮）</h2>
+    <p>キーワードを入力して「全エージェント起動」を押すと、6つのエージェントが連携して楽天ROOMの投稿コンテンツを一括生成します。</p>
+    <div class="orchestrator-controls">
+      <input type="text" id="masterInput" placeholder="例：アウトドア・キャンプ用品、ガジェット、筋トレ用品" />
+      <button class="btn" id="masterBtn" onclick="runAllAgents()">🚀 全エージェント起動</button>
+      <button class="btn btn-outline" onclick="runSimulation()">🔬 シミュレーション</button>
+      <button class="btn btn-danger" onclick="clearAll()">🗑 クリア</button>
+    </div>
+  </div>
+
+  <div class="section-title">⚡ 専門エージェント（個別実行も可能）</div>
+
+  <div class="agents-grid">
+    <!-- Riku: 商品リサーチャー -->
+    <div class="agent-card" id="card-0">
+      <div class="agent-header">
+        <div class="agent-emoji">🔍</div>
+        <div class="agent-info">
+          <h3>Riku（商品リサーチャー）</h3>
+          <p>楽天市場で大人の男性向けの商品をリサーチ</p>
+        </div>
+        <span class="agent-role">リサーチ</span>
+      </div>
+      <div class="agent-body">
+        <label>カテゴリ・キーワード</label>
+        <input type="text" id="input-0" placeholder="例：アウトドア、ガジェット、筋トレ、ファッション" />
+        <label>リサーチ結果</label>
+        <div class="output-area" id="output-0"></div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-0"></span>
+        <button class="btn btn-outline" onclick="copyOutput(0, this)">📋 コピー</button>
+        <button class="btn" onclick="runSingleAgent(0)">▶️ 実行</button>
+      </div>
+    </div>
+
+    <!-- Kōki: X投稿ライター -->
+    <div class="agent-card" id="card-1">
+      <div class="agent-header">
+        <div class="agent-emoji">✍️</div>
+        <div class="agent-info">
+          <h3>Kōki（X投稿ライター）</h3>
+          <p>こだわりパパキャラでX投稿文を生成</p>
+        </div>
+        <span class="agent-role" style="background: #1da1f2;">X投稿</span>
+      </div>
+      <div class="agent-body">
+        <label>商品名・価格（例：YETI クーラーボックス 15,800円）</label>
+        <input type="text" id="input-1" placeholder="商品名 価格" />
+        <label>X投稿文</label>
+        <div class="output-area" id="output-1"></div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-1"></span>
+        <button class="btn btn-outline" onclick="copyOutput(1, this)">📋 コピー</button>
+        <button class="btn" onclick="runSingleAgent(1)">▶️ 実行</button>
+      </div>
+    </div>
+
+    <!-- Mimi: 楽天ROOMキュレーター -->
+    <div class="agent-card" id="card-2">
+      <div class="agent-header">
+        <div class="agent-emoji">🏠</div>
+        <div class="agent-info">
+          <h3>Mimi（ROOMキュレーター）</h3>
+          <p>楽天ROOM投稿フォーマット一式を生成</p>
+        </div>
+        <span class="agent-role" style="background: #e91e8c;">ROOM</span>
+      </div>
+      <div class="agent-body">
+        <label>商品名・カテゴリ</label>
+        <input type="text" id="input-2" placeholder="例：スタンレー水筒 アウトドア" />
+        <label>投稿パターン</label>
+        <select id="pattern-2">
+          <option value="A">パターンA（旦那視点）</option>
+          <option value="B">パターンB（奥さん視点）</option>
+          <option value="C">パターンC（夫婦共同）</option>
+        </select>
+        <label>楽天ROOM投稿</label>
+        <div class="output-area" id="output-2"></div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-2"></span>
+        <button class="btn btn-outline" onclick="copyOutput(2, this)">📋 コピー</button>
+        <button class="btn" onclick="runSingleAgent(2)">▶️ 実行</button>
+      </div>
+    </div>
+
+    <!-- Hoshi: Threads占い投稿 -->
+    <div class="agent-card" id="card-3">
+      <div class="agent-header">
+        <div class="agent-emoji">⭐</div>
+        <div class="agent-info">
+          <h3>Hoshi（星読みパパ）</h3>
+          <p>Threads用の占い投稿で楽天商品を自然に紹介</p>
+        </div>
+        <span class="agent-role" style="background: #000;">Threads</span>
+      </div>
+      <div class="agent-body">
+        <label>テーマ・商品</label>
+        <input type="text" id="input-3" placeholder="例：アウトドア、開運グッズ、今日の運勢" />
+        <label>Threads占い投稿</label>
+        <div class="output-area" id="output-3"></div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-3"></span>
+        <button class="btn btn-outline" onclick="copyOutput(3, this)">📋 コピー</button>
+        <button class="btn" onclick="runSingleAgent(3)">▶️ 実行</button>
+      </div>
+    </div>
+
+    <!-- Check: 品質審査エージェント -->
+    <div class="agent-card" id="card-4">
+      <div class="agent-header">
+        <div class="agent-emoji">✅</div>
+        <div class="agent-info">
+          <h3>Check（品質審査）</h3>
+          <p>投稿内容の品質チェックと改善提案</p>
+        </div>
+        <span class="agent-role" style="background: #28a745;">審査</span>
+      </div>
+      <div class="agent-body">
+        <label>審査対象の投稿文</label>
+        <textarea id="input-4" placeholder="X投稿文やROOM投稿を貼り付け" rows="3"></textarea>
+        <label>審査結果・改善提案</label>
+        <div class="output-area" id="output-4"></div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-4"></span>
+        <button class="btn btn-outline" onclick="copyOutput(4, this)">📋 コピー</button>
+        <button class="btn" onclick="runSingleAgent(4)">▶️ 実行</button>
+      </div>
+    </div>
+
+    <!-- Plan: 週間投稿プランナー -->
+    <div class="agent-card" id="card-5">
+      <div class="agent-header">
+        <div class="agent-emoji">📅</div>
+        <div class="agent-info">
+          <h3>Plan（プランナー）</h3>
+          <p>週間投稿スケジュールの戦略立案</p>
+        </div>
+        <span class="agent-role" style="background: #6f42c1;">戦略</span>
+      </div>
+      <div class="agent-body">
+        <label>期間・テーマ</label>
+        <input type="text" id="input-5" placeholder="例：今週分、アウトドア強化週間" />
+        <label>週間投稿プラン</label>
+        <div class="output-area" id="output-5"></div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-5"></span>
+        <button class="btn btn-outline" onclick="copyOutput(5, this)">📋 コピー</button>
+        <button class="btn" onclick="runSingleAgent(5)">▶️ 実行</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-panel" id="resultPanel">
+    <h3>📊 統合レポート</h3>
+    <div class="result-content" id="resultContent"></div>
+    <div class="quick-actions">
+      <button class="btn" onclick="copyAllResults()">📋 全体コピー</button>
+      <button class="btn btn-outline" onclick="exportMarkdown()">📄 Markdown出力</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <p>🤖 楽天ROOM AIエージェントチーム v3.0 | Powered by Claude API</p>
+  <p>大人の男の"かっこいい"を集めるROOM - こだわりパパ</p>
+</div>
+
+<script>
+// === 設定 ===
+const API_URL = 'https://api.anthropic.com/v1/messages';
+const MODEL = 'claude-3-5-sonnet-20241022';
+
+// === エージェント定義 ===
+const AGENTS = [
+  {
+    // Riku: 商品リサーチャー
+    name: 'Riku（商品リサーチャー）',
+    system: `あなたは楽天市場の商品リサーチ専門エージェント「Riku」です。
+
+【ターゲット】40代・会社代表・2児のパパ・楽天ROOMユーザー
+【ROOMコンセプト】「大人の男の"かっこいい"を集めるROOM」
+【趣味・関心】アウトドア/PC/ガジェット/スポーツ/筋トレ/ファッション/グルメ
+
+【出力形式】
+①【商品名】
+②【価格帯】
+③【おすすめポイント】（大人の男性目線）
+④【使用シーン】
+⑤【楽天市場での人気度】
+
+必ず3商品を提案してください。価格は実際の楽天市場を参考に現実的な範囲で。`,
+    prompt: (input) => `カテゴリ「${input || 'アウトドア・ガジェット'}」で、楽天市場で実際に人気の商品を3つリサーチして提案してください。40代パパが「これはかっこいい！」と思う商品を選んでください。`
+  },
+  {
+    // Kōki: X投稿ライター
+    name: 'Kōki（X投稿ライター）',
+    system: `あなたはX（Twitter）投稿専門ライター「Kōki」です。
+
+【キャラ設定】40代・会社代表・2児のパパ「こだわりパパ」
+【投稿スタイル】
+- 自然体で等身大
+- 商品への愛情が伝わる
+- 家族エピソード混じり
+- 押し売り感なし
+
+【X投稿ルール】
+- 140字以内（日本語）
+- ハッシュタグ3個まで
+- 絵文字適度に使用
+- 楽天アフィリリンクは含めない（別途設置）
+
+【口調】関西弁混じりの親しみやすい関西人`,
+    prompt: (input) => `商品情報「${input}」について、こだわりパパキャラでX投稿文を作成してください。実際の体験談風に、家族との関係も織り交ぜて自然な投稿にしてください。`
+  },
+  {
+    // Mimi: 楽天ROOMキュレーター
+    name: 'Mimi（ROOMキュレーター）',
+    system: `あなたは楽天ROOM投稿専門エージェント「Mimi」です。
+
+【楽天ROOMの特性】
+- 投稿タイトル：20-30文字
+- レビュー文：80-150文字
+- 写真映えを意識
+- ハッシュタグ：7個推奨
+
+【投稿パターン】
+A: 旦那視点（自分で使った感想）
+B: 奥さん視点（旦那に買ってもらった／プレゼント）
+C: 夫婦共同（二人で選んだ商品）
+
+【出力形式】
+【投稿タイトル】
+【レビュー文】
+【おすすめポイント】
+【デメリット】（1つは必ず含める）
+【タグ】#○○ #○○ #○○ #○○ #○○ #○○ #○○
+【推奨投稿時間】`,
+    prompt: (input, extra) => `商品「${input}」について、投稿パターン${extra || 'A'}で楽天ROOM投稿コンテンツを生成してください。リアルな使用感とデメリットも正直に含めてください。`
+  },
+  {
+    // Hoshi: Threads占い投稿
+    name: 'Hoshi（星読みパパ）',
+    system: `あなたはThreads用占い投稿専門エージェント「Hoshi」です。
+
+【キャラ設定】星読みが趣味の40代パパ
+【投稿スタイル】
+- 各星座への今日のアドバイス
+- 開運アイテムとして楽天商品を自然に紹介
+- 占い要素と商品紹介の絶妙なバランス
+
+【Threads仕様】
+- 500文字以内
+- ハッシュタグ5個まで
+- 12星座それぞれに一言ずつ
+
+【出力形式】
+🌟今日の運勢🌟
+
+♈牡羊座：○○
+♉牡牛座：○○
+♊双子座：○○
+♋蟹座：○○
+♌獅子座：○○
+♍乙女座：○○
+♎天秤座：○○
+♏蠍座：○○
+♐射手座：○○
+♑山羊座：○○
+♒水瓶座：○○
+♓魚座：○○
+
+✨今日の開運アイテム✨
+【商品紹介】
+
+#占い #今日の運勢 #開運 #楽天ROOM #Threads`,
+    prompt: (input) => `テーマ「${input}」で今日の12星座占いを作成し、開運アイテムとして関連する楽天商品を自然に紹介してください。占いは本格的に、商品紹介は自然に行ってください。`
+  },
+  {
+    // Check: 品質審査エージェント
+    name: 'Check（品質審査）',
+    system: `あなたは投稿品質審査エージェント「Check」です。
+
+【審査項目】
+1. ターゲット適合性（40代男性向けか）
+2. 自然さ（宣伝感の少なさ）
+3. 文字数制限遵守
+4. ハッシュタグ適切性
+5. 楽天ROOM誘導の自然さ
+
+【改善提案】
+- 具体的な修正案を提示
+- より効果的な表現を提案
+- リスク要素の指摘
+
+【出力形式】
+【審査結果】⭐⭐⭐⭐☆（5段階評価）
+【良い点】
+【改善点】
+【修正提案】
+【推奨度】A/B/C`,
+    prompt: (input) => `以下の投稿内容を審査してください：\n\n${input}\n\n40代男性向け楽天ROOM投稿として適切か、改善点があれば具体的に提案してください。`
+  },
+  {
+    // Plan: 週間プランナー
+    name: 'Plan（プランナー）',
+    system: `あなたは週間投稿プランニング専門エージェント「Plan」です。
+
+【プランニング要素】
+- 投稿頻度と時間帯
+- カテゴリバランス
+- 季節性・トレンド考慮
+- X・楽天ROOM・Threads使い分け
+
+【出力形式】
+【今週のテーマ】
+【投稿スケジュール】
+月曜：○時 - ○○投稿（X/ROOM/Threads）
+火曜：○時 - ○○投稿
+...
+
+【重点商品カテゴリ】
+【狙うハッシュタグ】
+【注意事項・改善点】`,
+    prompt: (input) => `${input}について、楽天ROOM運営の週間投稿プランを立ててください。X・楽天ROOM・Threadsそれぞれの特性を活かした戦略的なスケジュールを提案してください。`
+  }
+];
+
+// === ユーティリティ関数 ===
+function getApiKey() {
+  return sessionStorage.getItem('claude_api_key') || '';
+}
+
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) {
+    alert('APIキーを入力してください');
+    return;
+  }
+  if (!key.startsWith('sk-ant-')) {
+    alert('正しいClaude APIキーを入力してください（sk-ant-で始まる）');
+    return;
+  }
+  
+  sessionStorage.setItem('claude_api_key', key);
+  document.getElementById('apiInputSection').style.display = 'none';
+  document.getElementById('apiSavedSection').style.display = 'flex';
+}
+
+function changeApiKey() {
+  document.getElementById('apiInputSection').style.display = 'flex';
+  document.getElementById('apiSavedSection').style.display = 'none';
+  document.getElementById('apiKeyInput').value = '';
+  sessionStorage.removeItem('claude_api_key');
+}
+
+// === Claude API呼び出し ===
+async function callClaude(system, prompt, retryCount = 0) {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error('APIキーが設定されていません');
+  }
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 1500,
+        system: system,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!response.ok) {
+      // リトライ対象のエラー
+      if ((response.status === 429 || response.status >= 500) && retryCount < 2) {
+        await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 1000));
+        return callClaude(system, prompt, retryCount + 1);
+      }
+      
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `API Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.content[0].text;
+  } catch (error) {
+    if (retryCount < 2 && (error.name === 'NetworkError' || error.message.includes('network'))) {
+      await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 1000));
+      return callClaude(system, prompt, retryCount + 1);
+    }
+    throw error;
+  }
+}
+
+// === 単一エージェント実行 ===
+async function runSingleAgent(index) {
+  const agent = AGENTS[index];
+  const card = document.getElementById(`card-${index}`);
+  const status = document.getElementById(`status-${index}`);
+  const output = document.getElementById(`output-${index}`);
+  const input = document.getElementById(`input-${index}`).value.trim();
+  
+  // 特別な入力処理
+  let extra = '';
+  if (index === 2) { // Mimi
+    extra = document.getElementById('pattern-2').value;
+  }
+
+  // UI更新
+  card.className = 'agent-card running';
+  status.className = 'agent-status running';
+  status.innerHTML = '<span class="spinner"></span>生成中...';
+  output.className = 'output-area visible';
+  output.textContent = '生成中...';
+
+  try {
+    const prompt = agent.prompt(input || '（お任せ）', extra);
+    const result = await callClaude(agent.system, prompt);
+    
+    output.textContent = result;
+    card.className = 'agent-card success';
+    status.className = 'agent-status success';
+    status.textContent = '✅ 生成完了';
+    
+    return result;
+  } catch (error) {
+    output.textContent = `❌ エラー: ${error.message}`;
+    card.className = 'agent-card';
+    status.className = 'agent-status';
+    status.textContent = '⚠️ エラー';
+    throw error;
+  }
+}
+
+// === 全エージェント実行 ===
+async function runAllAgents() {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    alert('APIキーを設定してください');
+    return;
+  }
+
+  const masterInput = document.getElementById('masterInput').value.trim();
+  const btn = document.getElementById('masterBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>実行中...';
+
+  try {
+    const keyword = masterInput || 'アウトドア・ガジェット';
+    
+    // Step 1: 各エージェントの入力を設定
+    document.getElementById('input-0').value = keyword; // Riku
+    document.getElementById('input-1').value = keyword; // Kōki
+    document.getElementById('input-2').value = keyword; // Mimi  
+    document.getElementById('input-3').value = keyword; // Hoshi
+    document.getElementById('input-5').value = `${keyword} 今週分`; // Plan
+
+    // Step 2: 主要エージェントを並列実行
+    const results = [];
+    await Promise.all([0, 1, 2, 3, 5].map(async (index) => {
+      try {
+        results[index] = await runSingleAgent(index);
+      } catch (error) {
+        results[index] = `❌ エラー: ${error.message}`;
+      }
+    }));
+
+    // Step 3: Checkエージェントで品質審査
+    if (results[1] && results[2]) {
+      const checkInput = `【X投稿】\n${results[1]}\n\n【楽天ROOM投稿】\n${results[2]}`;
+      document.getElementById('input-4').value = checkInput;
+      try {
+        results[4] = await runSingleAgent(4);
+      } catch (error) {
+        results[4] = `❌ 審査エラー: ${error.message}`;
+      }
+    }
+
+    // Step 4: 統合レポート表示
+    showIntegratedReport(keyword, results);
+
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🚀 全エージェント起動';
+  }
+}
+
+// === シミュレーション実行 ===
+function runSimulation() {
+  const keyword = 'アウトドア・ガジェット（シミュレーション）';
+  
+  const mockResults = [
+    // Riku: 商品リサーチ
+    `①【商品名】YETI ランブラー タンブラー 30oz
+②【価格帯】5,500円
+③【おすすめポイント】真空二重構造で保温保冷性能が抜群。仕事中のコーヒーが最後まで温かい
+④【使用シーン】オフィス・アウトドア・車内
+⑤【楽天市場での人気度】アウトドアカテゴリ上位
+
+①【商品名】Anker PowerCore 10000
+②【価格帯】3,200円  
+③【おすすめポイント】コンパクトなのに大容量。出張の必需品
+④【使用シーン】出張・キャンプ・緊急時
+⑤【楽天市場での人気度】モバイルバッテリー売れ筋1位
+
+①【商品名】Coleman ツーリングドームST
+②【価格帯】15,800円
+③【おすすめポイント】設営簡単で初心者でも安心。家族キャンプデビューに最適
+④【使用シーン】ファミリーキャンプ・ソロキャンプ
+⑤【楽天市場での人気度】テントカテゴリ常連`,
+
+    // Kōki: X投稿
+    `キャンプ道具、また増やしてしもた😅
+
+YETIのタンブラー買ったんやけど、これがまた優秀すぎて...朝のコーヒーが昼過ぎまでアツアツのまま✨
+
+奥さんに「また無駄遣い？」って言われたけど、仕事の効率上がるから投資やで〜
+
+#キャンプ道具 #YETI #こだわりパパ`,
+
+    // Mimi: 楽天ROOM投稿  
+    `【投稿タイトル】40代パパが選んだ最強タンブラー
+【レビュー文】夫が「仕事用に」と言って買ってきたYETIのタンブラー。確かに保温性は抜群だけど、値段も結構するのが悩みどころ。でも長く使えそうだし、キャンプでも活躍してくれそう。
+【おすすめポイント】保温性抜群・デザインがカッコいい・耐久性高い
+【デメリット】価格が高め
+【タグ】#YETI #タンブラー #アウトドア #キャンプ道具 #保温 #楽天ROOM #パパライフ
+【推奨投稿時間】平日 20:00-22:00（パパの帰宅後）`,
+
+    // Hoshi: Threads占い
+    `🌟今日の運勢🌟
+
+♈牡羊座：新しい挑戦の日。アウトドア用品が幸運を呼ぶ
+♉牡牛座：安定を求める気持ちが強まる。お気に入りのギア探しを
+♊双子座：コミュニケーション運up。キャンプ仲間との時間を
+♋蟹座：家族との絆深まる。ファミリーキャンプの計画を
+♌獅子座：注目度アップ。かっこいいギアでみんなの視線独り占め
+♍乙女座：細かな準備が吉。キャンプ道具の点検をしてみて
+♎天秤座：バランス感覚が冴える。機能とデザインの両立したアイテムを
+♏蠍座：深く探求する日。こだわりのギア選びに時間をかけて
+♐射手座：冒険心旺盛。新しいキャンプ場開拓の準備を
+♑山羊座：実用性重視の判断。長く使える質の良いものを選んで
+♒水瓶座：個性を活かして。人とは違うユニークなギアに注目
+♓魚座：直感が冴える。ピンとくるアイテムとの出会いがありそう
+
+✨今日の開運アイテム✨
+【YETIタンブラー】頑丈で長持ち、男のロマンが詰まった一品
+
+#占い #今日の運勢 #開運 #楽天ROOM #アウトドア`,
+
+    // Check: 審査結果
+    `【審査結果】⭐⭐⭐⭐⭐（5段階評価）
+
+【良い点】
+・自然体な関西弁で親しみやすい
+・実体験に基づく説得力のある表現
+・家族とのやり取りで人柄が伝わる
+・押し売り感が全くない
+
+【改善点】
+・特になし。非常に良いバランス
+
+【修正提案】
+・現状維持でOK
+
+【推奨度】A（そのまま投稿推奨）`,
+
+    // Plan: 週間プラン  
+    `【今週のテーマ】アウトドア・ガジェット強化週間
+
+【投稿スケジュール】
+月曜：7:30 - 朝活投稿（X）新商品情報
+火曜：12:00 - ランチタイム（ROOM）タンブラー紹介  
+火曜：20:00 - 夜の占い投稿（Threads）
+水曜：19:00 - 夕方投稿（X）使用感レビュー
+木曜：12:00 - お昼投稿（ROOM）モバイルバッテリー
+金曜：7:30 - 朝投稿（X）週末キャンプ準備
+土曜：10:00 - 休日投稿（ROOM）テント紹介
+日曜：20:00 - まとめ投稿（X）今週の振り返り
+
+【重点商品カテゴリ】
+1. アウトドア用品（テント・タープ）
+2. ガジェット（モバイルバッテリー・ライト）  
+3. ドリンクウェア（タンブラー・水筒）
+
+【狙うハッシュタグ】
+#アウトドア #キャンプ道具 #ガジェット #楽天ROOM #こだわりパパ
+
+【注意事項・改善点】
+・平日昼間の投稿でサラリーマン層にアプローチ
+・週末はファミリー向けコンテンツ強化
+・Threadsは夜時間帯で占い需要を狙う`
+  ];
+
+  // シミュレーション結果を各エージェントに表示
+  mockResults.forEach((result, index) => {
+    const output = document.getElementById(`output-${index}`);
+    const status = document.getElementById(`status-${index}`);
+    const card = document.getElementById(`card-${index}`);
+    
+    output.className = 'output-area visible';
+    output.textContent = result;
+    card.className = 'agent-card success';
+    status.className = 'agent-status success';
+    status.textContent = '✅ 生成完了（シミュレーション）';
+  });
+
+  // 統合レポートも表示
+  showIntegratedReport(keyword, mockResults);
+}
+
+// === 統合レポート表示 ===
+function showIntegratedReport(keyword, results) {
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  
+  const agentNames = [
+    '🔍 商品リサーチ（Riku）',
+    '✍️ X投稿文（Kōki）', 
+    '🏠 楽天ROOM投稿（Mimi）',
+    '⭐ Threads占い（Hoshi）',
+    '✅ 品質審査（Check）',
+    '📅 週間プラン（Plan）'
+  ];
+
+  let reportContent = `# 楽天ROOM AIエージェントチーム 統合レポート
+
+📅 生成日時：${dateStr}
+🎯 テーマ：${keyword}
+
+`;
+
+  results.forEach((result, index) => {
+    if (result) {
+      reportContent += `${'═'.repeat(50)}\n${agentNames[index]}\n${'═'.repeat(50)}\n${result}\n\n`;
+    }
+  });
+
+  reportContent += `
+${'═'.repeat(50)}
+📊 実行サマリー
+${'═'.repeat(50)}
+✅ 実行成功：${results.filter(r => r && !r.includes('❌')).length}/6 エージェント
+⚡ 実行時間：${dateStr}
+🎯 対象キーワード：${keyword}
+
+次のアクションプラン：
+1. X投稿文をコピーして投稿
+2. 楽天ROOM投稿を商品ページに設定
+3. Threads占い投稿をスケジュール
+4. 品質審査結果を参考に改善
+5. 週間プランに従って継続実行
+`;
+
+  document.getElementById('resultContent').textContent = reportContent;
+  document.getElementById('resultPanel').style.display = 'block';
+  document.getElementById('resultPanel').scrollIntoView({ behavior: 'smooth' });
+}
+
+// === コピー機能 ===
+function copyOutput(index, btn) {
+  const text = document.getElementById(`output-${index}`).textContent;
+  if (!text || text === '生成中...') return;
+  
+  navigator.clipboard.writeText(text).then(() => {
+    const originalText = btn.textContent;
+    btn.textContent = '✅ コピー済';
+    setTimeout(() => btn.textContent = originalText, 1500);
+  }).catch(() => {
+    alert('コピーに失敗しました');
+  });
+}
+
+function copyAllResults() {
+  const text = document.getElementById('resultContent').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('📋 統合レポートをクリップボードにコピーしました！');
+  }).catch(() => {
+    alert('コピーに失敗しました');
+  });
+}
+
+function exportMarkdown() {
+  const text = document.getElementById('resultContent').textContent;
+  const blob = new Blob([text], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `楽天ROOM_AIレポート_${new Date().toISOString().slice(0, 10)}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// === クリア機能 ===
+function clearAll() {
+  for (let i = 0; i < 6; i++) {
+    const output = document.getElementById(`output-${i}`);
+    const status = document.getElementById(`status-${i}`);
+    const card = document.getElementById(`card-${i}`);
+    
+    output.textContent = '';
+    output.className = 'output-area';
+    status.textContent = '';
+    status.className = 'agent-status';
+    card.className = 'agent-card';
+  }
+  document.getElementById('resultPanel').style.display = 'none';
+}
+
+// === 初期化 ===
+window.onload = function() {
+  const savedKey = sessionStorage.getItem('claude_api_key');
+  if (savedKey) {
+    document.getElementById('apiInputSection').style.display = 'none';
+    document.getElementById('apiSavedSection').style.display = 'flex';
+  }
+  console.log('🤖 楽天ROOM AIエージェントチーム v3.0 Ready!');
+};
+</script>
+</body>
+</html>
