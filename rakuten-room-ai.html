@@ -2,377 +2,1157 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>楽天ROOM 自動投稿AI</title>
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ROOM AI">
-<meta name="theme-color" content="#C0001A">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤖 楽天ROOM AIエージェントチーム | こだわりパパ</title>
 <style>
-:root{
-  --red:#C0001A;--red-dark:#8B0012;--red-glow:rgba(192,0,26,0.13);
-  --gold:#D4A017;--gold-light:#F5C842;
-  --cream:#FFFBF4;--paper:#FFF8EE;
-  --charcoal:#1C1C1E;--gray:#6B6B6B;
-  --light:#F2EDE4;--border:#E5DDD0;
-  --green:#1E7D3E;--green-light:#E8F5E9;
-  --shadow:0 2px 16px rgba(0,0,0,0.07);
+:root {
+  --bg: #0a0a0a;
+  --card: #1a1a1a;
+  --card-hover: #252525;
+  --border: #333;
+  --accent: #00a652;
+  --accent-hover: #008f47;
+  --accent2: #ff6b35;
+  --accent3: #4a90e2;
+  --text: #ffffff;
+  --text-muted: #888;
+  --success: #28a745;
+  --warning: #ffc107;
+  --danger: #dc3545;
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{-webkit-text-size-adjust:100%;}
-body{font-family:'Noto Sans JP',sans-serif;background:var(--cream);color:var(--charcoal);font-size:14px;overscroll-behavior:none;}
-button{touch-action:manipulation;font-family:inherit;cursor:pointer;}
-header{background:var(--red);padding:env(safe-area-inset-top) 20px 0;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(192,0,26,0.5);}
-.hdr{max-width:860px;margin:0 auto;display:flex;align-items:center;gap:12px;padding:11px 0;}
-.hdr-logo{font-size:18px;font-weight:900;color:#fff;letter-spacing:-0.5px;}
-.hdr-logo em{color:var(--gold-light);font-style:normal;}
-.hdr-right{margin-left:auto;display:flex;align-items:center;gap:8px;}
-.hdr-time{background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:4px 12px;font-size:12px;color:#fff;font-weight:700;}
-.hdr-key{background:rgba(255,255,255,0.18);border:1px solid rgba(255,255,255,0.3);border-radius:20px;padding:4px 10px;font-size:11px;color:#fff;font-weight:700;cursor:pointer;}
-.hdr-key.set{background:rgba(255,255,255,0.35);}
-main{max-width:860px;margin:0 auto;padding:16px 14px;padding-bottom:calc(80px + env(safe-area-inset-bottom));}
-.setup-screen{position:fixed;inset:0;background:var(--cream);z-index:500;display:flex;align-items:center;justify-content:center;padding:24px;}
-.setup-screen.hidden{display:none;}
-.setup-box{background:#fff;border:1px solid var(--border);border-radius:20px;padding:28px 24px;width:100%;max-width:440px;box-shadow:0 8px 40px rgba(0,0,0,0.12);}
-.setup-logo{font-size:40px;text-align:center;margin-bottom:12px;}
-.setup-title{font-size:20px;font-weight:900;text-align:center;margin-bottom:6px;}
-.setup-sub{font-size:13px;color:var(--gray);text-align:center;line-height:1.6;margin-bottom:20px;}
-.setup-step{background:var(--light);border-radius:10px;padding:12px 14px;font-size:12px;line-height:2;margin-bottom:16px;color:var(--charcoal);}
-.setup-step b{color:var(--red);}
-.setup-step a{color:var(--red);}
-.key-input-wrap{position:relative;margin-bottom:12px;}
-.key-input{width:100%;border:2px solid var(--border);border-radius:10px;padding:11px 40px 11px 13px;font-family:inherit;font-size:13px;outline:none;transition:border-color 0.2s;background:var(--paper);}
-.key-input:focus{border-color:var(--red);box-shadow:0 0 0 3px var(--red-glow);}
-.key-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:16px;cursor:pointer;padding:4px;}
-.key-hint{font-size:11px;color:var(--gray);margin-bottom:16px;line-height:1.5;}
-.btn-setup{width:100%;background:var(--red);color:#fff;border:none;border-radius:11px;padding:14px;font-size:15px;font-weight:800;}
-.btn-setup:active{transform:scale(0.98);}
-.setup-skip{text-align:center;margin-top:12px;font-size:12px;color:var(--gray);cursor:pointer;text-decoration:underline;}
-.safety-bar{background:#fff;border:1px solid var(--border);border-left:4px solid var(--gold);border-radius:12px;padding:10px 14px;display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;box-shadow:var(--shadow);}
-.si{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--gray);}
-.si strong{color:var(--charcoal);}
-.sdot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(30,125,62,0.2);}
-.count-bar{display:flex;gap:5px;margin-bottom:14px;}
-.cdot{flex:1;height:5px;border-radius:3px;background:var(--border);transition:background 0.4s;}
-.cdot.used{background:var(--red);}
-.notice{display:none;border-radius:10px;padding:11px 14px;font-size:13px;font-weight:600;margin-bottom:12px;align-items:center;gap:10px;line-height:1.5;}
-.notice.show{display:flex;}
-.notice.warn{background:#FFF3CD;border:1px solid #FFD700;color:#7A5C00;}
-.notice.info{background:var(--green-light);border:1px solid #A5D6A7;color:#1B5E20;}
-.notice.error{background:#FFF0F0;border:1px solid #FFCCCC;color:#8B0012;}
-.nclose{margin-left:auto;cursor:pointer;font-size:16px;opacity:0.6;flex-shrink:0;}
-.tabs{display:flex;background:#fff;border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow);}
-.tab{flex:1;padding:10px 4px;text-align:center;font-size:11px;font-weight:600;color:var(--gray);cursor:pointer;border-right:1px solid var(--border);transition:all 0.2s;}
-.tab:last-child{border-right:none;}
-.tab.active{background:var(--red);color:#fff;font-weight:800;}
-.tab .tn{display:block;font-size:15px;font-weight:900;line-height:1;margin-bottom:2px;}
-.scene-card{border-radius:14px;padding:14px 16px;margin-bottom:8px;position:relative;overflow:hidden;border:2px solid transparent;transition:all 0.2s;cursor:pointer;user-select:none;}
-.scene-card:not(.posted):active{transform:scale(0.985);}
-.scene-card.posted{opacity:0.45;cursor:default;}
-.scene-card.sel{box-shadow:0 4px 20px rgba(0,0,0,0.14);transform:translateY(-2px);}
-.sc-morning{background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-color:#FFB74D;}
-.sc-lunch{background:linear-gradient(135deg,#F3E5F5,#E1BEE7);border-color:#CE93D8;}
-.sc-afternoon{background:linear-gradient(135deg,#E8F5E9,#C8E6C9);border-color:#81C784;}
-.sc-evening{background:linear-gradient(135deg,#E3F2FD,#BBDEFB);border-color:#64B5F6;}
-.sc-night{background:linear-gradient(135deg,#EDE7F6,#D1C4E9);border-color:#9575CD;}
-.sc-morning.sel{border-color:#E65100;border-width:3px;}
-.sc-lunch.sel{border-color:#7B1FA2;border-width:3px;}
-.sc-afternoon.sel{border-color:#2E7D32;border-width:3px;}
-.sc-evening.sel{border-color:#1565C0;border-width:3px;}
-.sc-night.sel{border-color:#4527A0;border-width:3px;}
-.sc-top{display:flex;align-items:center;gap:10px;margin-bottom:9px;}
-.sc-emoji{font-size:26px;flex-shrink:0;}
-.sc-info{flex:1;min-width:0;}
-.sc-name{font-size:14px;font-weight:800;}
-.sc-sub{font-size:11px;color:var(--gray);margin-top:2px;line-height:1.4;}
-.sc-time{background:rgba(0,0,0,0.08);border-radius:7px;padding:3px 8px;font-size:11px;font-weight:700;white-space:nowrap;flex-shrink:0;}
-.sc-chips{display:flex;gap:5px;flex-wrap:wrap;}
-.sc-chip{background:rgba(255,255,255,0.75);border:1px solid rgba(0,0,0,0.1);border-radius:20px;padding:2px 8px;font-size:11px;font-weight:600;}
-.sc-chip.pat{background:rgba(0,0,0,0.08);font-weight:800;}
-.fbadge{position:absolute;top:9px;right:9px;border-radius:20px;padding:2px 8px;font-size:10px;font-weight:800;color:#fff;}
-.bc{background:var(--red);animation:pulse 2s infinite;}
-.bp{background:var(--green);}
-.bs{background:rgba(0,0,0,0.6);}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(192,0,26,0.4);}50%{box-shadow:0 0 0 7px rgba(192,0,26,0);}}
-.card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:var(--shadow);}
-.card-hdr{font-size:14px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
-.cicon{width:26px;height:26px;border-radius:7px;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
-label{display:block;font-size:12px;font-weight:700;color:var(--gray);margin-bottom:5px;}
-textarea{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-family:inherit;font-size:13px;color:var(--charcoal);background:var(--paper);outline:none;resize:vertical;min-height:52px;transition:border-color 0.2s,box-shadow 0.2s;margin-bottom:12px;}
-textarea:focus{border-color:var(--red);box-shadow:0 0 0 3px var(--red-glow);}
-.btn-gen{width:100%;background:var(--red);color:#fff;border:none;border-radius:11px;padding:13px;font-size:15px;font-weight:800;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
-.btn-gen:active:not(:disabled){transform:scale(0.98);}
-.btn-gen:disabled{background:#bbb;cursor:not-allowed;}
-.lwrap{text-align:center;padding:28px 20px;}
-.spinner{width:40px;height:40px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 12px;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.lsteps{max-width:280px;margin:14px auto 0;text-align:left;}
-.lstep{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;color:var(--gray);}
-.lstep.active{color:var(--charcoal);font-weight:700;}
-.lstep.done{color:var(--green);}
-.li{width:16px;text-align:center;}
-.rwrap{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;box-shadow:var(--shadow);animation:fadeUp 0.3s ease;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-.rbanner{border-radius:10px;padding:11px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;}
-.rbanner .be{font-size:22px;}
-.rbanner .bt{font-size:13px;font-weight:800;}
-.rbanner .bs2{font-size:11px;opacity:0.75;margin-top:2px;}
-.rlbl{font-size:10px;font-weight:800;color:var(--gray);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:5px;}
-.rbox{background:var(--light);border:1px solid var(--border);border-radius:9px;padding:10px 12px;line-height:1.7;margin-bottom:11px;}
-.rrow{display:flex;gap:7px;align-items:flex-start;}
-.rtxt{flex:1;}
-.edit-area{width:100%;border:1.5px solid transparent;border-radius:7px;padding:3px 5px;font-family:inherit;font-size:14px;color:var(--charcoal);background:transparent;outline:none;resize:none;line-height:1.7;transition:all 0.2s;}
-.edit-area:focus{border-color:var(--red);background:#fff;box-shadow:0 0 0 3px var(--red-glow);}
-.charcount{font-size:11px;color:var(--gray);margin-top:3px;}
-.charcount.over{color:var(--red);font-weight:700;}
-.charcount.ok{color:var(--green);}
-.tags-wrap{display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
-.tag{background:#fff;border:1px solid var(--red);color:var(--red);border-radius:20px;padding:3px 8px 3px 10px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:3px;}
-.tdel{cursor:pointer;font-size:11px;opacity:0.5;padding:0 2px;}
-.tdel:hover{opacity:1;}
-.tag-inp{border:1.5px dashed var(--border);border-radius:20px;padding:3px 9px;font-family:inherit;font-size:11px;outline:none;width:85px;color:var(--charcoal);background:var(--paper);transition:all 0.2s;}
-.tag-inp:focus{border-color:var(--red);width:110px;}
-.bcopy{background:#fff;color:var(--red);border:1.5px solid var(--red);border-radius:7px;padding:5px 10px;font-size:11px;font-weight:700;transition:all 0.2s;white-space:nowrap;flex-shrink:0;}
-.bcopy:active{background:var(--red);color:#fff;}
-.bcopy.copied{background:var(--green);color:#fff;border-color:var(--green);}
-.igrid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:11px;}
-.icell{background:var(--light);border-radius:8px;padding:8px 10px;}
-.icell .il{font-size:10px;color:var(--gray);font-weight:700;margin-bottom:2px;}
-.icell .iv{font-size:12px;font-weight:800;}
-.tbadge{display:inline-flex;align-items:center;gap:6px;background:#FFFDE7;border:1px solid var(--gold);border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;color:#795500;margin-bottom:11px;}
-.allcopy{width:100%;border:none;background:var(--red);color:#fff;border-radius:11px;padding:13px;font-size:15px;font-weight:800;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;}
-.allcopy:active{transform:scale(0.98);}
-.actrow{display:flex;gap:7px;justify-content:flex-end;flex-wrap:wrap;margin-top:11px;}
-.bsub{background:var(--light);color:var(--charcoal);border:1.5px solid var(--border);border-radius:9px;padding:8px 14px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;}
-.bregen{background:#FFF3E0;color:#E65100;border:1.5px solid #FFCC80;border-radius:9px;padding:8px 14px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;}
-.bok{background:var(--green);color:#fff;border:none;border-radius:9px;padding:8px 16px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:5px;}
-.divider{border:none;border-top:1px solid var(--border);margin:12px 0;}
-.errbox{background:#FFF0F0;border:1px solid #FFCCCC;border-radius:9px;padding:11px 13px;color:#8B0012;font-size:13px;line-height:1.6;}
-.copy-modal{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:9000;display:flex;align-items:flex-end;justify-content:center;padding:0;}
-.copy-modal-box{background:#fff;border-radius:20px 20px 0 0;padding:20px;width:100%;max-width:600px;padding-bottom:calc(20px + env(safe-area-inset-bottom));animation:slideUp2 0.3s ease;}
-@keyframes slideUp2{from{transform:translateY(100%);}to{transform:translateY(0);}}
-.copy-modal-title{font-size:15px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;}
-.copy-modal-close{font-size:20px;cursor:pointer;opacity:0.5;padding:0 4px;}
-.copy-modal-ta{width:100%;height:200px;border:1.5px solid var(--border);border-radius:10px;padding:10px;font-size:13px;line-height:1.7;resize:none;background:var(--paper);font-family:inherit;margin-bottom:12px;}
-.copy-modal-btn{width:100%;background:var(--red);color:#fff;border:none;border-radius:11px;padding:13px;font-size:14px;font-weight:800;}
-.hitem{border:1px solid var(--border);border-radius:10px;margin-bottom:7px;background:var(--paper);overflow:hidden;}
-.hitem-hdr{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;}
-.hitem-hdr:active{background:var(--light);}
-.hemoji{font-size:16px;flex-shrink:0;}
-.hname{font-size:13px;font-weight:700;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.hdate{font-size:10px;color:var(--gray);white-space:nowrap;}
-.hpat{font-size:10px;background:var(--light);padding:2px 7px;border-radius:6px;font-weight:700;white-space:nowrap;}
-.hexp{font-size:11px;color:var(--gray);flex-shrink:0;}
-.hdet{display:none;padding:9px 12px 12px;border-top:1px solid var(--border);font-size:12px;line-height:1.7;}
-.hdet.open{display:block;}
-.hdlbl{font-size:10px;font-weight:800;color:var(--gray);margin-top:7px;margin-bottom:3px;}
-.hdval{background:var(--light);border-radius:7px;padding:6px 9px;line-height:1.7;}
-.hdtags{display:flex;flex-wrap:wrap;gap:4px;margin-top:3px;}
-.hdtag{background:#fff;border:1px solid var(--red);color:var(--red);border-radius:20px;padding:2px 7px;font-size:10px;font-weight:700;}
-.hempty{text-align:center;padding:30px;color:var(--gray);}
-.hstats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:12px;}
-.hstat{background:var(--light);border-radius:9px;padding:9px;text-align:center;}
-.hstat .sv{font-size:19px;font-weight:900;color:var(--red);}
-.hstat .sl{font-size:10px;color:var(--gray);margin-top:2px;}
-@media(max-width:480px){.igrid{grid-template-columns:1fr;}.sc-sub{display:none;}}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Hiragino Sans', 'YuGothic', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.header {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-bottom: 2px solid var(--accent);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-title .emoji { font-size: 1.8rem; }
+.header-title .brand { color: var(--accent); }
+
+.api-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.api-input {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 10px 16px;
+  font-size: 0.9rem;
+  font-family: monospace;
+  min-width: 300px;
+}
+
+.btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--accent);
+  color: var(--accent);
+}
+
+.btn-outline:hover {
+  background: var(--accent);
+  color: white;
+}
+
+.btn-danger { background: var(--danger); }
+.btn-danger:hover { background: #c82333; }
+
+.status-saved {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  color: var(--success);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.main { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+.orchestrator {
+  background: linear-gradient(135deg, var(--card) 0%, #2a2a2a 100%);
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: 0 8px 32px rgba(0, 166, 82, 0.1);
+}
+
+.orchestrator h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.orchestrator p {
+  color: var(--text-muted);
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.orchestrator-controls {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.orchestrator-controls input {
+  flex: 1;
+  min-width: 250px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 12px 16px;
+  font-size: 0.95rem;
+}
+
+.section-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 32px 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+}
+
+.agents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 20px;
+}
+
+.agent-card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s;
+  display: flex;
+  flex-direction: column;
+}
+
+.agent-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 32px rgba(0, 166, 82, 0.15);
+}
+
+.agent-card.running {
+  border-color: var(--warning);
+  box-shadow: 0 8px 32px rgba(255, 193, 7, 0.2);
+}
+
+.agent-card.success {
+  border-color: var(--success);
+  box-shadow: 0 8px 32px rgba(40, 167, 69, 0.2);
+}
+
+.agent-header {
+  background: linear-gradient(135deg, var(--card-hover) 0%, #333 100%);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.agent-emoji {
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent);
+  border-radius: 12px;
+  flex-shrink: 0;
+}
+
+.agent-info h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.agent-info p {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.agent-role {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  background: var(--accent2);
+  border-radius: 20px;
+  padding: 4px 12px;
+  white-space: nowrap;
+}
+
+.agent-body {
+  padding: 20px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.agent-body label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.agent-body input,
+.agent-body select,
+.agent-body textarea {
+  width: 100%;
+  background: var(--card-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.output-area {
+  background: var(--card-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  min-height: 100px;
+  font-size: 0.85rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+  display: none;
+  font-family: 'SF Mono', monospace;
+}
+
+.output-area.visible { display: block; }
+
+.agent-footer {
+  padding: 16px 20px;
+  background: var(--card-hover);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.agent-status {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  flex: 1;
+}
+
+.agent-status.running {
+  color: var(--warning);
+  font-weight: 600;
+}
+
+.agent-status.success {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.result-panel {
+  background: var(--card);
+  border: 2px solid var(--accent);
+  border-radius: 16px;
+  padding: 24px;
+  margin-top: 32px;
+  display: none;
+}
+
+.result-panel h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.result-content {
+  background: var(--card-hover);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 20px;
+  white-space: pre-wrap;
+  font-family: 'SF Mono', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.quick-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.footer {
+  text-align: center;
+  padding: 32px 24px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--border);
+  margin-top: 48px;
+}
+
+@media (max-width: 768px) {
+  .agents-grid { grid-template-columns: 1fr; }
+  .header { padding: 16px; }
+  .orchestrator { padding: 20px; }
+  .api-section { width: 100%; }
+  .api-input { min-width: auto; }
+}
 </style>
 </head>
 <body>
-<div class="setup-screen" id="setupScreen">
-  <div class="setup-box">
-    <div class="setup-logo">🏮</div>
-    <div class="setup-title">楽天ROOM 自動投稿AI</div>
-    <div class="setup-sub">使用するにはAnthropicのAPIキーが必要です。<br>1回設定すればこの端末では記憶されます。</div>
-    <div class="setup-step">
-      <b>① </b><a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> にアクセス<br>
-      <b>② </b>「API Keys」→「Create Key」でキーを作成<br>
-      <b>③ </b>「sk-ant-...」で始まる文字列をコピー<br>
-      <b>④ </b>下の入力欄に貼り付けて「開始」をタップ
+
+<div class="header">
+  <div class="header-title">
+    <span class="emoji">🤖</span>
+    <span>楽天ROOM AI</span><span class="brand">エージェントチーム</span>
+  </div>
+  
+  <div class="api-section">
+    <div id="apiInputSection">
+      <input type="password" id="apiKeyInput" class="api-input" placeholder="Claude API Key (sk-ant-...)" />
+      <button class="btn" onclick="saveApiKey()">保存</button>
     </div>
-    <div class="key-input-wrap">
-      <input class="key-input" id="keyInput" type="password" placeholder="sk-ant-api03-..." autocomplete="off" spellcheck="false">
-      <button class="key-toggle" onclick="toggleKeyVis()" id="keyToggleBtn">👁</button>
+    <div id="apiSavedSection" class="status-saved">
+      <span>✅ APIキー設定済み</span>
+      <button class="btn btn-outline" onclick="changeApiKey()">変更</button>
     </div>
-    <div class="key-hint">⚠️ APIキーはこの端末のlocalStorageにのみ保存されます。</div>
-    <button class="btn-setup" onclick="saveKey()">🚀 開始する</button>
-    <div class="setup-skip" onclick="skipSetup()">スキップ（生成機能は使えません）</div>
   </div>
 </div>
-<header>
-  <div class="hdr">
-    <div class="hdr-logo">🏮 楽天ROOM <em>自動投稿AI</em></div>
-    <div class="hdr-right">
-      <div class="hdr-time" id="clock">--:--</div>
-      <div class="hdr-key" id="keyBtn" onclick="showSetup()">🔑 APIキー</div>
+
+<div class="main">
+  <div class="orchestrator">
+    <h2>🎯 オーケストレーター（全体指揮）</h2>
+    <p>キーワードを入力して「全エージェント起動」を押すと、6つのエージェントが連携して楽天ROOMの投稿コンテンツを一括生成します。</p>
+    <div class="orchestrator-controls">
+      <input type="text" id="masterInput" placeholder="例：アウトドア・キャンプ用品、ガジェット、筋トレ用品" />
+      <button class="btn" id="masterBtn" onclick="runAllAgents()">🚀 全エージェント起動</button>
+      <button class="btn btn-outline" onclick="runSimulation()">🔬 シミュレーション</button>
+      <button class="btn btn-danger" onclick="clearAll()">🗑 クリア</button>
     </div>
   </div>
-</header>
-<main>
-  <div class="safety-bar">
-    <div class="si"><div class="sdot"></div>本日: <strong id="todayCount">0</strong>&thinsp;/ 5件</div>
-    <div class="si">⏱️ 間隔: <strong>2時間以上</strong></div>
-    <div class="si">🚫 重複: <strong>チェック中</strong></div>
-    <div class="si">👫 夫婦: <strong>ON</strong></div>
-  </div>
-  <div class="count-bar">
-    <div class="cdot" id="cd0"></div><div class="cdot" id="cd1"></div>
-    <div class="cdot" id="cd2"></div><div class="cdot" id="cd3"></div>
-    <div class="cdot" id="cd4"></div>
-  </div>
-  <div class="notice" id="notice"><span id="noticeMsg"></span><span class="nclose" onclick="hideNotice()">✕</span></div>
-  <div class="tabs">
-    <div class="tab active" id="tab1" onclick="goTab(1)"><span class="tn">1</span>選択</div>
-    <div class="tab" id="tab2" onclick="goTab(2)"><span class="tn">2</span>生成中</div>
-    <div class="tab" id="tab3" onclick="goTab(3)"><span class="tn">3</span>投稿内容</div>
-    <div class="tab" id="tab4" onclick="goTab(4)"><span class="tn">4</span>履歴</div>
-  </div>
-  <div id="v1">
-    <div id="scenes"></div>
-    <div class="card">
-      <div class="card-hdr"><div class="cicon">✏️</div>追加リクエスト（任意）</div>
-      <label>AIへの補足</label>
-      <textarea id="extraReq" placeholder="例：「プレゼント向け」「節約テーマ」「秋冬向け」など"></textarea>
-      <button class="btn-gen" id="genBtn" onclick="startGen()" disabled>スロットを選んでください</button>
-    </div>
-  </div>
-  <div id="v2" style="display:none;">
-    <div class="card">
-      <div class="lwrap">
-        <div class="spinner"></div>
-        <div style="font-size:15px;font-weight:800;margin-bottom:4px;">AIが生成中です…</div>
-        <div style="font-size:12px;color:var(--gray);" id="loadlabel"></div>
-        <div class="lsteps">
-          <div class="lstep" id="ls1"><span class="li">⏳</span>楽天ランキングをリサーチ中</div>
-          <div class="lstep" id="ls2"><span class="li">⏳</span>商品ページを分析中</div>
-          <div class="lstep" id="ls3"><span class="li">⏳</span>レビュー文を生成中</div>
-          <div class="lstep" id="ls4"><span class="li">⏳</span>タイトル・タグを作成中</div>
-          <div class="lstep" id="ls5"><span class="li">⏳</span>重複チェック・仕上げ</div>
+
+  <div class="section-title">⚡ 専門エージェント（個別実行も可能）</div>
+
+  <div class="agents-grid">
+    <!-- Riku: 商品リサーチャー -->
+    <div class="agent-card" id="card-0">
+      <div class="agent-header">
+        <div class="agent-emoji">🔍</div>
+        <div class="agent-info">
+          <h3>Riku（商品リサーチャー）</h3>
+          <p>楽天市場で大人の男性向けの商品をリサーチ</p>
         </div>
+        <span class="agent-role">リサーチ</span>
+      </div>
+      <div class="agent-body">
+        <label>カテゴリ・キーワード</label>
+        <input type="text" id="input-0" placeholder="例：アウトドア、ガジェット、筋トレ、ファッション" />
+        <label>リサーチ結果</label>
+        <div class="output-area" id="output-0"></div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-0"></span>
+        <button class="btn btn-outline" onclick="copyOutput(0, this)">📋 コピー</button>
+        <button class="btn" onclick="runSingleAgent(0)">▶️ 実行</button>
+      </div>
+    </div>
+
+    <!-- Kōki: X投稿ライター -->
+    <div class="agent-card" id="card-1">
+      <div class="agent-header">
+        <div class="agent-emoji">✍️</div>
+        <div class="agent-info">
+          <h3>Kōki（X投稿ライター）</h3>
+          <p>こだわりパパキャラでX投稿文を生成</p>
+        </div>
+        <span class="agent-role" style="background: #1da1f2;">X投稿</span>
+      </div>
+      <div class="agent-body">
+        <label>商品名・価格（例：YETI クーラーボックス 15,800円）</label>
+        <input type="text" id="input-1" placeholder="商品名 価格" />
+        <label>X投稿文</label>
+        <div class="output-area" id="output-1"></div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-1"></span>
+        <button class="btn btn-outline" onclick="copyOutput(1, this)">📋 コピー</button>
+        <button class="btn" onclick="runSingleAgent(1)">▶️ 実行</button>
+      </div>
+    </div>
+
+    <!-- Mimi: 楽天ROOMキュレーター -->
+    <div class="agent-card" id="card-2">
+      <div class="agent-header">
+        <div class="agent-emoji">🏠</div>
+        <div class="agent-info">
+          <h3>Mimi（ROOMキュレーター）</h3>
+          <p>楽天ROOM投稿フォーマット一式を生成</p>
+        </div>
+        <span class="agent-role" style="background: #e91e8c;">ROOM</span>
+      </div>
+      <div class="agent-body">
+        <label>商品名・カテゴリ</label>
+        <input type="text" id="input-2" placeholder="例：スタンレー水筒 アウトドア" />
+        <label>投稿パターン</label>
+        <select id="pattern-2">
+          <option value="A">パターンA（旦那視点）</option>
+          <option value="B">パターンB（奥さん視点）</option>
+          <option value="C">パターンC（夫婦共同）</option>
+        </select>
+        <label>楽天ROOM投稿</label>
+        <div class="output-area" id="output-2"></div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-2"></span>
+        <button class="btn btn-outline" onclick="copyOutput(2, this)">📋 コピー</button>
+        <button class="btn" onclick="runSingleAgent(2)">▶️ 実行</button>
+      </div>
+    </div>
+
+    <!-- Hoshi: Threads占い投稿 -->
+    <div class="agent-card" id="card-3">
+      <div class="agent-header">
+        <div class="agent-emoji">⭐</div>
+        <div class="agent-info">
+          <h3>Hoshi（星読みパパ）</h3>
+          <p>Threads用の占い投稿で楽天商品を自然に紹介</p>
+        </div>
+        <span class="agent-role" style="background: #000;">Threads</span>
+      </div>
+      <div class="agent-body">
+        <label>テーマ・商品</label>
+        <input type="text" id="input-3" placeholder="例：アウトドア、開運グッズ、今日の運勢" />
+        <label>Threads占い投稿</label>
+        <div class="output-area" id="output-3"></div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-3"></span>
+        <button class="btn btn-outline" onclick="copyOutput(3, this)">📋 コピー</button>
+        <button class="btn" onclick="runSingleAgent(3)">▶️ 実行</button>
+      </div>
+    </div>
+
+    <!-- Check: 品質審査エージェント -->
+    <div class="agent-card" id="card-4">
+      <div class="agent-header">
+        <div class="agent-emoji">✅</div>
+        <div class="agent-info">
+          <h3>Check（品質審査）</h3>
+          <p>投稿内容の品質チェックと改善提案</p>
+        </div>
+        <span class="agent-role" style="background: #28a745;">審査</span>
+      </div>
+      <div class="agent-body">
+        <label>審査対象の投稿文</label>
+        <textarea id="input-4" placeholder="X投稿文やROOM投稿を貼り付け" rows="3"></textarea>
+        <label>審査結果・改善提案</label>
+        <div class="output-area" id="output-4"></div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-4"></span>
+        <button class="btn btn-outline" onclick="copyOutput(4, this)">📋 コピー</button>
+        <button class="btn" onclick="runSingleAgent(4)">▶️ 実行</button>
+      </div>
+    </div>
+
+    <!-- Plan: 週間投稿プランナー -->
+    <div class="agent-card" id="card-5">
+      <div class="agent-header">
+        <div class="agent-emoji">📅</div>
+        <div class="agent-info">
+          <h3>Plan（プランナー）</h3>
+          <p>週間投稿スケジュールの戦略立案</p>
+        </div>
+        <span class="agent-role" style="background: #6f42c1;">戦略</span>
+      </div>
+      <div class="agent-body">
+        <label>期間・テーマ</label>
+        <input type="text" id="input-5" placeholder="例：今週分、アウトドア強化週間" />
+        <label>週間投稿プラン</label>
+        <div class="output-area" id="output-5"></div>
+      </div>
+      <div class="agent-footer">
+        <span class="agent-status" id="status-5"></span>
+        <button class="btn btn-outline" onclick="copyOutput(5, this)">📋 コピー</button>
+        <button class="btn" onclick="runSingleAgent(5)">▶️ 実行</button>
       </div>
     </div>
   </div>
-  <div id="v3" style="display:none;">
-    <div class="rwrap" id="result"></div>
-    <div class="actrow">
-      <button class="bsub" onclick="resetAll()">← 最初から</button>
-      <button class="bregen" onclick="doRegen()">🔄 再生成</button>
-      <button class="bok" onclick="markPosted()">✅ 投稿済みとして記録</button>
+
+  <div class="result-panel" id="resultPanel">
+    <h3>📊 統合レポート</h3>
+    <div class="result-content" id="resultContent"></div>
+    <div class="quick-actions">
+      <button class="btn" onclick="copyAllResults()">📋 全体コピー</button>
+      <button class="btn btn-outline" onclick="exportMarkdown()">📄 Markdown出力</button>
     </div>
-  </div>
-  <div id="v4" style="display:none;">
-    <div class="card">
-      <div class="card-hdr"><div class="cicon">📊</div>投稿統計</div>
-      <div class="hstats" id="hstats"></div>
-    </div>
-    <div class="card">
-      <div class="card-hdr"><div class="cicon">📋</div>投稿履歴</div>
-      <div id="hlist"></div>
-      <div style="text-align:right;margin-top:12px;">
-        <button class="bsub" onclick="clearHist()">🗑️ 履歴をリセット</button>
-      </div>
-    </div>
-  </div>
-</main>
-<div class="copy-modal" id="copyModal" style="display:none;" onclick="closeCopyModal(event)">
-  <div class="copy-modal-box">
-    <div class="copy-modal-title">
-      <span>📋 テキストをコピー</span>
-      <span class="copy-modal-close" onclick="document.getElementById('copyModal').style.display='none'">✕</span>
-    </div>
-    <textarea class="copy-modal-ta" id="copyModalTa" readonly></textarea>
-    <button class="copy-modal-btn" onclick="nativeCopyFromModal()">全選択してコピー</button>
   </div>
 </div>
+
+<div class="footer">
+  <p>🤖 楽天ROOM AIエージェントチーム v3.0 | Powered by Claude API</p>
+  <p>大人の男の"かっこいい"を集めるROOM - こだわりパパ</p>
+</div>
+
 <script>
-var SLOTS=[
-  {id:'morning',emoji:'🌅',name:'朝の通勤',timeRange:'6:00〜9:00',startH:6,endH:9,cls:'sc-morning',
-   cats:['スマートフォン・タブレット','パソコン・周辺機器','メンズファッション','レディースファッション','バッグ・小物'],
-   pattern:'husband',plabel:'👨 旦那視点',
-   ptone:'落ち着いた感嘆調。「妻に勧められて使ってみたけど」「男目線でもこれは納得」などを自然に入れる',
-   reason:'通勤中はガジェット・ファッション系が目に留まりやすい'},
-  {id:'lunch',emoji:'☀️',name:'昼休憩',timeRange:'12:00〜13:00',startH:12,endH:13,cls:'sc-lunch',
-   cats:['グルメ・食品','美容・コスメ','スキンケア','日用品・生活雑貨','スイーツ・おやつ'],
-   pattern:'wife',plabel:'👩 奥さん視点',
-   ptone:'明るく共感系。「夫もこれなら片付けてくれる（笑）」「見た目が可愛くてテンション上がる」を自然に入れる',
-   reason:'ランチタイムはグルメ・コスメ閲覧が急増'},
-  {id:'afternoon',emoji:'☕',name:'午後休み',timeRange:'15:00〜16:00',startH:15,endH:16,cls:'sc-afternoon',
-   cats:['インテリア・収納','寝具・枕','キッチン用品','ホームグッズ','生活家電'],
-   pattern:'couple',plabel:'👫 夫婦共同',
-   ptone:'温かみのある二人の日常。「夫婦でこれに決めて正解でした」「二人で使うからコスパも良い」を自然に入れる',
-   reason:'午後の小休憩は家のことを考えるタイミング'},
-  {id:'evening',emoji:'🌆',name:'帰りの通勤',timeRange:'18:00〜20:00',startH:18,endH:20,cls:'sc-evening',
-   cats:['スポーツ・アウトドア','筋トレ・フィットネス','家電・ガジェット','ゴルフ','趣味・ホビー'],
-   pattern:'husband',plabel:'👨 旦那視点',
-   ptone:'少し興奮気味な旦那口調。「仕事終わりにポチってしまった」「男として外せないアイテム」を自然に入れる',
-   reason:'帰り道はスポーツ・趣味コンテンツの閲覧が急増'},
-  {id:'night',emoji:'🌙',name:'就寝前',timeRange:'21:00〜23:00',startH:21,endH:23,cls:'sc-night',
-   cats:['寝具・枕・マットレス','スキンケア・美容','アロマ・リラックス','入浴グッズ','ルームウェア'],
-   pattern:'couple',plabel:'👫 夫婦共同',
-   ptone:'就寝前の穏やかで温かい口調。「夫婦でお気に入りになった」「寝る前の二人の時間が豊かになった」を自然に入れる',
-   reason:'就寝前は購買意欲が最高潮'}
+// === 設定 ===
+const API_URL = 'https://api.anthropic.com/v1/messages';
+const MODEL = 'claude-sonnet-4-6';
+
+// === エージェント定義 ===
+const AGENTS = [
+  {
+    // Riku: 商品リサーチャー
+    name: 'Riku（商品リサーチャー）',
+    system: `あなたは楽天市場の商品リサーチ専門エージェント「Riku」です。
+
+【ターゲット】40代・会社代表・2児のパパ・楽天ROOMユーザー
+【ROOMコンセプト】「大人の男の"かっこいい"を集めるROOM」
+【趣味・関心】アウトドア/PC/ガジェット/スポーツ/筋トレ/ファッション/グルメ
+
+【出力形式】
+①【商品名】
+②【価格帯】
+③【おすすめポイント】（大人の男性目線）
+④【使用シーン】
+⑤【楽天市場での人気度】
+
+必ず3商品を提案してください。価格は実際の楽天市場を参考に現実的な範囲で。`,
+    prompt: (input) => `カテゴリ「${input || 'アウトドア・ガジェット'}」で、楽天市場で実際に人気の商品を3つリサーチして提案してください。40代パパが「これはかっこいい！」と思う商品を選んでください。`
+  },
+  {
+    // Kōki: X投稿ライター
+    name: 'Kōki（X投稿ライター）',
+    system: `あなたはX（Twitter）投稿専門ライター「Kōki」です。
+
+【キャラ設定】40代・会社代表・2児のパパ「こだわりパパ」
+【投稿スタイル】
+- 自然体で等身大
+- 商品への愛情が伝わる
+- 家族エピソード混じり
+- 押し売り感なし
+
+【X投稿ルール】
+- 140字以内（日本語）
+- ハッシュタグ3個まで
+- 絵文字適度に使用
+- 楽天アフィリリンクは含めない（別途設置）
+
+【口調】関西弁混じりの親しみやすい関西人`,
+    prompt: (input) => `商品情報「${input}」について、こだわりパパキャラでX投稿文を作成してください。実際の体験談風に、家族との関係も織り交ぜて自然な投稿にしてください。`
+  },
+  {
+    // Mimi: 楽天ROOMキュレーター
+    name: 'Mimi（ROOMキュレーター）',
+    system: `あなたは楽天ROOM投稿専門エージェント「Mimi」です。
+
+【楽天ROOMの特性】
+- 投稿タイトル：20-30文字
+- レビュー文：80-150文字
+- 写真映えを意識
+- ハッシュタグ：7個推奨
+
+【投稿パターン】
+A: 旦那視点（自分で使った感想）
+B: 奥さん視点（旦那に買ってもらった／プレゼント）
+C: 夫婦共同（二人で選んだ商品）
+
+【出力形式】
+【投稿タイトル】
+【レビュー文】
+【おすすめポイント】
+【デメリット】（1つは必ず含める）
+【タグ】#○○ #○○ #○○ #○○ #○○ #○○ #○○
+【推奨投稿時間】`,
+    prompt: (input, extra) => `商品「${input}」について、投稿パターン${extra || 'A'}で楽天ROOM投稿コンテンツを生成してください。リアルな使用感とデメリットも正直に含めてください。`
+  },
+  {
+    // Hoshi: Threads占い投稿
+    name: 'Hoshi（星読みパパ）',
+    system: `あなたはThreads用占い投稿専門エージェント「Hoshi」です。
+
+【キャラ設定】星読みが趣味の40代パパ
+【投稿スタイル】
+- 各星座への今日のアドバイス
+- 開運アイテムとして楽天商品を自然に紹介
+- 占い要素と商品紹介の絶妙なバランス
+
+【Threads仕様】
+- 500文字以内
+- ハッシュタグ5個まで
+- 12星座それぞれに一言ずつ
+
+【出力形式】
+🌟今日の運勢🌟
+
+♈牡羊座：○○
+♉牡牛座：○○
+♊双子座：○○
+♋蟹座：○○
+♌獅子座：○○
+♍乙女座：○○
+♎天秤座：○○
+♏蠍座：○○
+♐射手座：○○
+♑山羊座：○○
+♒水瓶座：○○
+♓魚座：○○
+
+✨今日の開運アイテム✨
+【商品紹介】
+
+#占い #今日の運勢 #開運 #楽天ROOM #Threads`,
+    prompt: (input) => `テーマ「${input}」で今日の12星座占いを作成し、開運アイテムとして関連する楽天商品を自然に紹介してください。占いは本格的に、商品紹介は自然に行ってください。`
+  },
+  {
+    // Check: 品質審査エージェント
+    name: 'Check（品質審査）',
+    system: `あなたは投稿品質審査エージェント「Check」です。
+
+【審査項目】
+1. ターゲット適合性（40代男性向けか）
+2. 自然さ（宣伝感の少なさ）
+3. 文字数制限遵守
+4. ハッシュタグ適切性
+5. 楽天ROOM誘導の自然さ
+
+【改善提案】
+- 具体的な修正案を提示
+- より効果的な表現を提案
+- リスク要素の指摘
+
+【出力形式】
+【審査結果】⭐⭐⭐⭐☆（5段階評価）
+【良い点】
+【改善点】
+【修正提案】
+【推奨度】A/B/C`,
+    prompt: (input) => `以下の投稿内容を審査してください：\n\n${input}\n\n40代男性向け楽天ROOM投稿として適切か、改善点があれば具体的に提案してください。`
+  },
+  {
+    // Plan: 週間プランナー
+    name: 'Plan（プランナー）',
+    system: `あなたは週間投稿プランニング専門エージェント「Plan」です。
+
+【プランニング要素】
+- 投稿頻度と時間帯
+- カテゴリバランス
+- 季節性・トレンド考慮
+- X・楽天ROOM・Threads使い分け
+
+【出力形式】
+【今週のテーマ】
+【投稿スケジュール】
+月曜：○時 - ○○投稿（X/ROOM/Threads）
+火曜：○時 - ○○投稿
+...
+
+【重点商品カテゴリ】
+【狙うハッシュタグ】
+【注意事項・改善点】`,
+    prompt: (input) => `${input}について、楽天ROOM運営の週間投稿プランを立ててください。X・楽天ROOM・Threadsそれぞれの特性を活かした戦略的なスケジュールを提案してください。`
+  }
 ];
-var SBGS={morning:'linear-gradient(135deg,#FFF3E0,#FFE0B2)',lunch:'linear-gradient(135deg,#F3E5F5,#E1BEE7)',afternoon:'linear-gradient(135deg,#E8F5E9,#C8E6C9)',evening:'linear-gradient(135deg,#E3F2FD,#BBDEFB)',night:'linear-gradient(135deg,#EDE7F6,#D1C4E9)'};
-var selSlot=null,curResult=null,curSlot=null;
-window.addEventListener('DOMContentLoaded',function(){
-  if(!getKey()){document.getElementById('setupScreen').classList.remove('hidden');}
-  else{document.getElementById('setupScreen').classList.add('hidden');document.getElementById('keyBtn').classList.add('set');document.getElementById('keyBtn').textContent='🔑 設定済み';}
-  setInterval(tick,1000);tick();
-  renderScenes();updateBar();
-  document.getElementById('scenes').addEventListener('click',function(e){
-    var card=e.target.closest('[data-sid]');
-    if(!card||isPosted(card.dataset.sid))return;
-    selSlot=card.dataset.sid;hideNotice();renderScenes();
-  });
+
+// === 起動時にAPIキー復元 ===
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('claude_api_key');
+  if (saved) {
+    document.getElementById('apiInputSection').style.display = 'none';
+    document.getElementById('apiSavedSection').style.display = 'flex';
+  }
 });
-function tick(){var n=new Date();document.getElementById('clock').textContent='🕐'+pad(n.getHours())+':'+pad(n.getMinutes());}
-function pad(x){return String(x).padStart(2,'0');}
-function getKey(){return localStorage.getItem('rr_apikey')||'';}
-function setKey(k){localStorage.setItem('rr_apikey',k);}
-function toggleKeyVis(){var inp=document.getElementById('keyInput'),btn=document.getElementById('keyToggleBtn');if(inp.type==='password'){inp.type='text';btn.textContent='🔒';}else{inp.type='password';btn.textContent='👁';}}
-function saveKey(){var val=document.getElementById('keyInput').value.trim();if(!val.startsWith('sk-ant-')){showNotice('APIキーは「sk-ant-」で始まる文字列です。確認してください。','error');return;}setKey(val);document.getElementById('setupScreen').classList.add('hidden');document.getElementById('keyBtn').classList.add('set');document.getElementById('keyBtn').textContent='🔑 設定済み';showNotice('✅ APIキーを保存しました！','info');}
-function showSetup(){var existing=getKey();if(existing)document.getElementById('keyInput').value=existing;document.getElementById('setupScreen').classList.remove('hidden');}
-function skipSetup(){document.getElementById('setupScreen').classList.add('hidden');showNotice('⚠️ APIキー未設定のため生成機能は使えません。右上の「🔑 APIキー」から設定できます。','warn');}
-function getHist(){try{return JSON.parse(localStorage.getItem('rr2')||'[]');}catch(e){return[];}}
-function setHist(h){localStorage.setItem('rr2',JSON.stringify(h));}
-function todayHist(){var t=new Date().toDateString();return getHist().filter(function(h){return new Date(h.date).toDateString()===t;});}
-function isPosted(id){return todayHist().some(function(h){return h.slotId===id;});}
-function updateBar(){var tc=todayHist().length;document.getElementById('todayCount').textContent=tc;for(var i=0;i<5;i++)document.getElementById('cd'+i).classList.toggle('used',i<tc);}
-function showNotice(msg,type){var el=document.getElementById('notice');document.getElementById('noticeMsg').textContent=msg;el.className='notice show '+(type||'warn');}
-function hideNotice(){document.getElementById('notice').className='notice';}
-function curSlotId(){var h=new Date().getHours();for(var i=0;i<SLOTS.length;i++){if(h>=SLOTS[i].startH&&h<SLOTS[i].endH)return SLOTS[i].id;}return null;}
-function renderScenes(){var curId=curSlotId();if(!selSlot){if(curId&&!isPosted(curId))selSlot=curId;else{for(var i=0;i<SLOTS.length;i++){if(!isPosted(SLOTS[i].id)){selSlot=SLOTS[i].id;break;}}}}var html='';for(var i=0;i<SLOTS.length;i++){var s=SLOTS[i],posted=isPosted(s.id),isSel=s.id===selSlot,isCur=s.id===curId;var badge=posted?'<div class="fbadge bp">✅ 投稿済み</div>':isSel?'<div class="fbadge bs">✔ 選択中</div>':isCur?'<div class="fbadge bc">📍 今の時間帯</div>':'';var chips=s.cats.slice(0,4).map(function(c){return'<div class="sc-chip">'+c+'</div>';}).join('');if(s.cats.length>4)chips+='<div class="sc-chip">+'+(s.cats.length-4)+'</div>';html+='<div class="scene-card '+s.cls+(posted?' posted':'')+(isSel&&!posted?' sel':'')+'" data-sid="'+s.id+'">'+badge+'<div class="sc-top"><div class="sc-emoji">'+s.emoji+'</div><div class="sc-info"><div class="sc-name">'+s.name+'</div><div class="sc-sub">'+s.reason+'</div></div><div class="sc-time">'+s.timeRange+'</div></div><div class="sc-chips"><div class="sc-chip pat">'+s.plabel+'</div>'+chips+'</div></div>';}document.getElementById('scenes').innerHTML=html;updateGenBtn();}
-function updateGenBtn(){var s=SLOTS.find(function(s){return s.id===selSlot;}),btn=document.getElementById('genBtn');var allDone=SLOTS.every(function(s){return isPosted(s.id);});if(allDone){btn.textContent='🎉 本日の全スロット投稿完了！';btn.disabled=true;}else if(s&&!isPosted(s.id)){btn.textContent=s.emoji+' 「'+s.name+'」のコンテンツを生成する';btn.disabled=false;}else{btn.textContent='スロットを選んでください';btn.disabled=true;}}
-function startGen(){if(!getKey()){showSetup();return;}var th=todayHist();if(th.length>=5){showNotice('⚠️ 本日の投稿上限（5件）に達しました。明日またお試しください。');return;}if(!selSlot){showNotice('投稿スロットを選んでください。');return;}if(th.length>0){var diff=(new Date()-new Date(th[th.length-1].date))/3600000;if(diff<2){showNotice('⏰ 前回から2時間経っていません。あと約'+Math.ceil((2-diff)*60)+'分後にお試しください。');return;}}curSlot=SLOTS.find(function(s){return s.id===selSlot;});runGen(false);}
-function doRegen(){if(!curSlot){resetAll();return;}goTab(2);resetSteps();runGen(true);}
-async function runGen(isRegen){var slot=curSlot,hist=getHist(),extra=document.getElementById('extraReq').value.trim();var posted=hist.map(function(h){return h.productName;}).join('、')||'なし';document.getElementById('loadlabel').textContent=slot.emoji+' '+slot.name+'（'+slot.timeRange+'）を生成中';goTab(2);resetSteps();var animP=runAnim();var aiP=callAI(slot,extra,posted,isRegen);try{var rs=await Promise.all([animP,aiP]);var text=rs[1];var m=text.match(/\{[\s\S]*\}/);if(!m)throw new Error('JSONが取得できませんでした。再試行してください。');curResult=JSON.parse(m[0]);var req=['productName','postTitle','reviewText','tags'];for(var i=0;i<req.length;i++){if(!curResult[req[i]])throw new Error('生成データが不完全です。再試行してください。');}if(!Array.isArray(curResult.tags))curResult.tags=[];renderResult(curResult,slot);goTab(3);}catch(e){goTab(3);document.getElementById('result').innerHTML='<div class="card-hdr"><div class="cicon">⚠️</div>生成エラー</div><div class="errbox">'+esc(e.message||'不明なエラー')+'</div><div class="actrow" style="margin-top:12px;"><button class="bsub" onclick="resetAll()">← 最初から</button><button class="bregen" onclick="doRegen()">🔄 再試行</button></div>';}}
-async function callAI(slot,extra,posted,isRegen){var key=getKey();if(!key)throw new Error('APIキーが設定されていません。右上の🔑ボタンから設定してください。');var prompt='楽天市場で今人気の商品を1つ選んでください。'+(isRegen?'前回とは別の商品にしてください。':'')+'\n\n条件:\n・時間帯: '+slot.name+'('+slot.timeRange+')\n・カテゴリ: '+slot.cats.join(', ')+'\n・レビューパターン: '+slot.plabel+'\n・文体: '+slot.ptone+'\n・追加リクエスト: '+(extra||'なし')+'\n・重複禁止商品: '+posted+'\n\nレビュー文ルール:\n・80〜140文字\n・自然な語り口、宣伝禁止\n・デメリット1つ必須\n・指定パターンの口調を入れる\n\n以下のJSONのみ返してください:\n{"productName":"商品名","price":"価格","rating":"評価","reviewCount":"件数","productUrl":"楽天市場URL","selectionReason":"選定理由","target":"ターゲット","merit":"メリット","demerit":"デメリット","postTitle":"タイトル(20〜30文字)","reviewText":"レビュー文(80〜140文字)","tags":["#タグ1","#タグ2","#タグ3","#タグ4","#タグ5","#タグ6","#タグ7"],"thumbText":"サムネ一言(10〜15文字)","bestPostTime":"推奨投稿時間"}';var r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,tools:[{type:'web_search_20250305',name:'web_search'}],system:'楽天ROOM投稿AIです。JSONのみ返してください。',messages:[{role:'user',content:prompt}]})});if(!r.ok){var b=await r.text().catch(function(){return'';});throw new Error('APIエラー '+r.status+': '+b.slice(0,120));}var d=await r.json();if(d.error)throw new Error(d.error.message||'APIエラー');return d.content.filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');}
-async function runAnim(){for(var i=1;i<=5;i++){var el=document.getElementById('ls'+i);el.classList.add('active');el.querySelector('.li').textContent='🔄';await new Promise(function(r){setTimeout(r,700);});el.classList.remove('active');el.classList.add('done');el.querySelector('.li').textContent='✅';}}
-function resetSteps(){for(var i=1;i<=5;i++){var el=document.getElementById('ls'+i);el.classList.remove('active','done');el.querySelector('.li').textContent='⏳';}}
-function renderResult(r,slot){var tags=Array.isArray(r.tags)?r.tags:[];var tagsHtml=tags.map(function(t,i){return tagEl(t,i);}).join('');document.getElementById('result').innerHTML='<div class="rbanner" style="background:'+SBGS[slot.id]+'"><div class="be">'+slot.emoji+'</div><div><div class="bt">'+slot.name+'（'+slot.timeRange+'）</div><div class="bs2">'+slot.plabel+' ／ ターゲット: '+esc(r.target||'—')+'</div></div></div><div class="rlbl">🛍️ 選定商品</div><div class="igrid"><div class="icell"><div class="il">商品名</div><div class="iv" style="font-size:11px;">'+esc(r.productName||'—')+'</div></div><div class="icell"><div class="il">価格</div><div class="iv">¥'+(Number(String(r.price||0).replace(/[^0-9]/g,''))||0).toLocaleString()+'</div></div><div class="icell"><div class="il">評価/レビュー数</div><div class="iv">'+(r.rating||'—')+'⭐ ('+(r.reviewCount||'—')+'件)</div></div><div class="icell"><div class="il">選定理由</div><div class="iv" style="font-size:11px;font-weight:600;">'+esc(r.selectionReason||'—')+'</div></div></div><div class="rbox" style="font-size:12px;margin-bottom:11px;">✅ <b>メリット:</b> '+esc(r.merit||'—')+'&emsp;⚠️ <b>デメリット:</b> '+esc(r.demerit||'—')+'</div><div class="rlbl">📝 投稿タイトル <span style="font-size:10px;font-weight:400;color:var(--gray)">（タップで編集）</span></div><div class="rbox"><div class="rrow"><textarea class="edit-area" id="rt-title" rows="1" oninput="aResize(this)">'+esc(r.postTitle||'')+'</textarea><button class="bcopy" onclick="cpEdit(\'rt-title\',this)">📋</button></div></div><div class="rlbl">✍️ レビュー文 <span style="font-size:10px;font-weight:400;color:var(--gray)">（80〜140文字）</span></div><div class="rbox"><div class="rrow"><textarea class="edit-area" id="rt-review" rows="3" oninput="aResize(this);updCC()">'+esc(r.reviewText||'')+'</textarea><button class="bcopy" onclick="cpEdit(\'rt-review\',this)">📋</button></div><div class="charcount" id="cc"></div></div><div class="rlbl">🏷️ タグ <span style="font-size:10px;font-weight:400;color:var(--gray)">（✕で削除・入力で追加）</span></div><div class="rbox"><div class="rrow"><div class="tags-wrap" id="tagswrap">'+tagsHtml+'<input class="tag-inp" id="taginp" placeholder="+ タグ追加" onkeydown="addTag(event)"></div><button class="bcopy" onclick="cpTags(this)">📋</button></div></div><div class="rlbl">🖼️ サムネ用一言 <span style="font-size:10px;font-weight:400;color:var(--gray)">（タップで編集）</span></div><div class="rbox"><div class="rrow"><textarea class="edit-area" id="rt-thumb" rows="1" oninput="aResize(this)">'+esc(r.thumbText||'')+'</textarea><button class="bcopy" onclick="cpEdit(\'rt-thumb\',this)">📋</button></div></div><div class="rlbl">⏰ 推奨投稿時間</div><div class="tbadge" style="margin-bottom:11px;">🕐 '+esc(r.bestPostTime||'—')+'</div><div class="rlbl">🔗 商品URL</div><div class="rbox" style="font-size:12px;word-break:break-all;"><div class="rrow"><div class="rtxt" id="rt-url">'+esc(r.productUrl||'—')+'</div><button class="bcopy" onclick="cpEl(\'rt-url\',this)">📋</button></div></div><div class="divider"></div><button class="allcopy" onclick="cpAll(this)">📋 すべての投稿内容をまとめてコピー</button>';updCC();document.querySelectorAll('.edit-area').forEach(aResize);}
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function tagEl(t,i){var label=t.startsWith('#')?t:'#'+t;return'<span class="tag">'+esc(label)+'<span class="tdel" onclick="this.parentElement.remove()">✕</span></span>';}
-function aResize(el){el.style.height='auto';el.style.height=el.scrollHeight+'px';}
-function updCC(){var ta=document.getElementById('rt-review'),cc=document.getElementById('cc');if(!ta||!cc)return;var len=ta.value.length;cc.textContent=len+'文字 '+(len<80?'（あと'+(80-len)+'文字）':len>140?'（'+(len-140)+'文字オーバー）':'（OK ✅）');cc.className='charcount '+(len<80||len>140?'over':'ok');}
-function addTag(e){if(e.key!=='Enter')return;e.preventDefault();var inp=document.getElementById('taginp'),val=inp.value.trim();if(!val)return;if(!val.startsWith('#'))val='#'+val;var wrap=document.getElementById('tagswrap'),span=document.createElement('span');span.className='tag';span.innerHTML=esc(val)+'<span class="tdel" onclick="this.parentElement.remove()">✕</span>';wrap.insertBefore(span,inp);inp.value='';}
-function doCopy(text,btn,isAll){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){if(btn)flashBtn(btn,isAll);}).catch(function(){if(!execCopy(text))openCopyModal(text,btn,isAll);else if(btn)flashBtn(btn,isAll);});return;}if(execCopy(text)){if(btn)flashBtn(btn,isAll);return;}openCopyModal(text,btn,isAll);}
-function execCopy(text){try{var ta=document.createElement('textarea');ta.value=text;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;top:0;left:0;width:2em;height:2em;opacity:0;';document.body.appendChild(ta);ta.focus();ta.select();if(/iphone|ipad|ipod/i.test(navigator.userAgent)){var range=document.createRange();range.selectNodeContents(ta);var sel=window.getSelection();sel.removeAllRanges();sel.addRange(range);ta.setSelectionRange(0,999999);}var ok=document.execCommand('copy');document.body.removeChild(ta);return ok;}catch(e){return false;}}
-function flashBtn(btn,isAll){if(isAll){var o=btn.innerHTML;btn.innerHTML='✅ コピー完了！楽天ROOMに貼り付けてください';btn.style.background='var(--green)';setTimeout(function(){btn.innerHTML=o;btn.style.background='';},3000);}else{var o=btn.textContent;btn.textContent='✅';btn.classList.add('copied');setTimeout(function(){btn.textContent=o;btn.classList.remove('copied');},2000);}}
-var _copyModalBtn=null,_copyModalIsAll=false;
-function openCopyModal(text,btn,isAll){_copyModalBtn=btn;_copyModalIsAll=isAll;var ta=document.getElementById('copyModalTa');ta.value=text;document.getElementById('copyModal').style.display='flex';setTimeout(function(){ta.focus();ta.setSelectionRange(0,ta.value.length);},150);}
-function nativeCopyFromModal(){var ta=document.getElementById('copyModalTa');ta.focus();ta.setSelectionRange(0,ta.value.length);var ok=execCopy(ta.value);if(!ok&&navigator.clipboard){navigator.clipboard.writeText(ta.value).then(function(){document.getElementById('copyModal').style.display='none';if(_copyModalBtn)flashBtn(_copyModalBtn,_copyModalIsAll);}).catch(function(){showNotice('上のテキストを長押し→全選択→コピーしてください。','warn');});return;}document.getElementById('copyModal').style.display='none';if(_copyModalBtn)flashBtn(_copyModalBtn,_copyModalIsAll);}
-function closeCopyModal(e){if(e.target===document.getElementById('copyModal'))document.getElementById('copyModal').style.display='none';}
-function cpEdit(id,btn){var el=document.getElementById(id);doCopy(el.value!==undefined?el.value.trim():el.textContent.trim(),btn,false);}
-function cpEl(id,btn){doCopy(document.getElementById(id).textContent.trim(),btn,false);}
-function cpTags(btn){var tags=Array.from(document.querySelectorAll('#tagswrap .tag')).map(function(t){return t.textContent.replace('✕','').trim();}).join(' ');doCopy(tags,btn,false);}
-function cpAll(btn){if(!curResult)return;var title=(document.getElementById('rt-title')||{value:''}).value.trim()||curResult.postTitle||'';var review=(document.getElementById('rt-review')||{value:''}).value.trim()||curResult.reviewText||'';var thumb=(document.getElementById('rt-thumb')||{value:''}).value.trim()||curResult.thumbText||'';var tags=Array.from(document.querySelectorAll('#tagswrap .tag')).map(function(t){return t.textContent.replace('✕','').trim();}).join(' ');if(!tags&&curResult.tags)tags=curResult.tags.map(function(t){return t.startsWith('#')?t:'#'+t;}).join(' ');var txt='【投稿タイトル】\n'+title+'\n\n【レビュー文】\n'+review+'\n\n【タグ】\n'+tags+'\n\n【サムネ用一言】\n'+thumb+'\n\n【商品URL】\n'+(curResult.productUrl||'')+'\n\n【推奨投稿時間】\n'+(curResult.bestPostTime||'');doCopy(txt,btn,true);}
-function markPosted(){if(!curResult)return;var slot=curSlot||SLOTS.find(function(s){return s.id===selSlot;});if(!slot)return;var title=(document.getElementById('rt-title')||{value:''}).value.trim()||curResult.postTitle;var review=(document.getElementById('rt-review')||{value:''}).value.trim()||curResult.reviewText;var thumb=(document.getElementById('rt-thumb')||{value:''}).value.trim()||curResult.thumbText;var tags=Array.from(document.querySelectorAll('#tagswrap .tag')).map(function(t){return t.textContent.replace('✕','').trim();});var hist=getHist();hist.push({productName:curResult.productName,price:curResult.price,rating:curResult.rating,slotId:slot.id,slotName:slot.name,slotEmoji:slot.emoji,pattern:slot.pattern,patternLabel:slot.plabel,postTitle:title,reviewText:review,thumbText:thumb,tags:tags,productUrl:curResult.productUrl,bestPostTime:curResult.bestPostTime,date:new Date().toISOString()});setHist(hist);updateBar();showNotice('✅「'+curResult.productName+'」を投稿済みとして記録しました！','info');resetAll(false);goTab(4);}
-function resetAll(go){if(go===undefined)go=true;curResult=null;curSlot=null;selSlot=null;document.getElementById('extraReq').value='';resetSteps();renderScenes();if(go)goTab(1);}
-function renderHist(){var hist=getHist(),td=todayHist().length,total=hist.length;var pats={};hist.forEach(function(h){pats[h.pattern]=(pats[h.pattern]||0)+1;});var top=Object.entries(pats).sort(function(a,b){return b[1]-a[1];})[0];var topL=top?({husband:'👨旦那',wife:'👩奥さん',couple:'👫夫婦'}[top[0]]||top[0]):'—';document.getElementById('hstats').innerHTML='<div class="hstat"><div class="sv">'+total+'</div><div class="sl">総投稿数</div></div><div class="hstat"><div class="sv">'+td+'</div><div class="sl">今日の投稿</div></div><div class="hstat"><div class="sv" style="font-size:14px;">'+topL+'</div><div class="sl">多いパターン</div></div>';var list=document.getElementById('hlist');if(!hist.length){list.innerHTML='<div class="hempty">📭 まだ投稿履歴がありません</div>';return;}var th=todayHist(),html='';if(th.length>0){var last=new Date(th[th.length-1].date),next=new Date(last.getTime()+2*3600000);html+=next>new Date()?'<div class="tbadge" style="margin-bottom:11px;">⏰ 次の投稿まで約'+Math.ceil((next-new Date())/60000)+'分</div>':'<div class="tbadge" style="margin-bottom:11px;background:var(--green-light);border-color:#A5D6A7;color:#1B5E20;">✅ 次の投稿が可能です</div>';}var rev=hist.slice().reverse();for(var i=0;i<rev.length;i++){var h=rev[i],idx=hist.length-1-i;var pL={husband:'👨旦那',wife:'👩奥さん',couple:'👫夫婦'}[h.pattern]||(h.pattern||'');var d=new Date(h.date);var ds=(d.getMonth()+1)+'/'+d.getDate()+' '+pad(d.getHours())+':'+pad(d.getMinutes());var tagsH=h.tags&&h.tags.length?'<div class="hdlbl">🏷️ タグ</div><div class="hdtags">'+h.tags.map(function(t){return'<span class="hdtag">'+esc(t)+'</span>';}).join('')+'</div>':'';html+='<div class="hitem"><div class="hitem-hdr" onclick="toggleDet('+idx+')"><div class="hemoji">'+(h.slotEmoji||'📌')+'</div><div class="hname">'+esc(h.productName||'')+'</div><div class="hdate">'+ds+'</div><div class="hpat">'+pL+'</div><div class="hexp" id="hx'+idx+'">▼</div></div><div class="hdet" id="hd'+idx+'"><div class="hdlbl">📝 タイトル</div><div class="hdval">'+esc(h.postTitle||'—')+'</div><div class="hdlbl">✍️ レビュー文</div><div class="hdval">'+esc(h.reviewText||'—')+'</div>'+tagsH+'<div class="hdlbl">🖼️ サムネ</div><div class="hdval">'+esc(h.thumbText||'—')+'</div><div style="text-align:right;margin-top:9px;"><button class="bcopy" onclick="reuse('+idx+')">この内容を再利用</button></div></div></div>';}list.innerHTML=html;}
-function toggleDet(idx){var det=document.getElementById('hd'+idx),exp=document.getElementById('hx'+idx);var open=det.classList.contains('open');document.querySelectorAll('.hdet.open').forEach(function(d){d.classList.remove('open');});document.querySelectorAll('.hexp').forEach(function(e){e.textContent='▼';});if(!open){det.classList.add('open');exp.textContent='▲';}}
-function reuse(idx){var hist=getHist(),item=hist[idx];if(!item)return;var slot=SLOTS.find(function(s){return s.id===item.slotId;});if(!slot||isPosted(slot.id)){showNotice('このスロットは本日投稿済みのため再利用できません。');return;}curResult=Object.assign({},item);curSlot=slot;selSlot=slot.id;renderResult(curResult,slot);goTab(3);showNotice('✏️ 履歴から読み込みました。編集して再利用できます。','info');}
-function clearHist(){if(!confirm('投稿履歴を全て削除しますか？'))return;localStorage.removeItem('rr2');updateBar();renderHist();renderScenes();}
-function goTab(n){[1,2,3,4].forEach(function(i){document.getElementById('v'+i).style.display='none';document.getElementById('tab'+i).classList.remove('active');});document.getElementById('v'+n).style.display='block';document.getElementById('tab'+n).classList.add('active');if(n===4)renderHist();}
+
+// === ユーティリティ関数 ===
+function getApiKey() {
+  return localStorage.getItem('claude_api_key') || '';
+}
+
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) {
+    alert('APIキーを入力してください');
+    return;
+  }
+  if (!key.startsWith('sk-ant-')) {
+    alert('正しいClaude APIキーを入力してください（sk-ant-で始まる）');
+    return;
+  }
+  
+  localStorage.setItem('claude_api_key', key);
+  document.getElementById('apiInputSection').style.display = 'none';
+  document.getElementById('apiSavedSection').style.display = 'flex';
+}
+
+function changeApiKey() {
+  document.getElementById('apiInputSection').style.display = 'flex';
+  document.getElementById('apiSavedSection').style.display = 'none';
+  document.getElementById('apiKeyInput').value = '';
+  localStorage.removeItem('claude_api_key');
+}
+
+// === Claude API呼び出し ===
+async function callClaude(system, prompt, retryCount = 0) {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    throw new Error('APIキーが設定されていません');
+  }
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        max_tokens: 1500,
+        system: system,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!response.ok) {
+      // リトライ対象のエラー
+      if ((response.status === 429 || response.status >= 500) && retryCount < 2) {
+        await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 1000));
+        return callClaude(system, prompt, retryCount + 1);
+      }
+      
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error?.message || `API Error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.content[0].text;
+  } catch (error) {
+    if (retryCount < 2 && (error.name === 'NetworkError' || error.message.includes('network'))) {
+      await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 1000));
+      return callClaude(system, prompt, retryCount + 1);
+    }
+    throw error;
+  }
+}
+
+// === 単一エージェント実行 ===
+async function runSingleAgent(index) {
+  const agent = AGENTS[index];
+  const card = document.getElementById(`card-${index}`);
+  const status = document.getElementById(`status-${index}`);
+  const output = document.getElementById(`output-${index}`);
+  const input = document.getElementById(`input-${index}`).value.trim();
+  
+  // 特別な入力処理
+  let extra = '';
+  if (index === 2) { // Mimi
+    extra = document.getElementById('pattern-2').value;
+  }
+
+  // UI更新
+  card.className = 'agent-card running';
+  status.className = 'agent-status running';
+  status.innerHTML = '<span class="spinner"></span>生成中...';
+  output.className = 'output-area visible';
+  output.textContent = '生成中...';
+
+  try {
+    const prompt = agent.prompt(input || '（お任せ）', extra);
+    const result = await callClaude(agent.system, prompt);
+    
+    output.textContent = result;
+    card.className = 'agent-card success';
+    status.className = 'agent-status success';
+    status.textContent = '✅ 生成完了';
+    
+    return result;
+  } catch (error) {
+    output.textContent = `❌ エラー: ${error.message}`;
+    card.className = 'agent-card';
+    status.className = 'agent-status';
+    status.textContent = '⚠️ エラー';
+    throw error;
+  }
+}
+
+// === 全エージェント実行 ===
+async function runAllAgents() {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    alert('APIキーを設定してください');
+    return;
+  }
+
+  const masterInput = document.getElementById('masterInput').value.trim();
+  const btn = document.getElementById('masterBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>実行中...';
+
+  try {
+    const keyword = masterInput || 'アウトドア・ガジェット';
+    const results = [];
+
+    // Step 1: Rikuで商品リサーチ（先に実行）
+    document.getElementById('input-0').value = keyword;
+    try {
+      results[0] = await runSingleAgent(0);
+    } catch (error) {
+      results[0] = `❌ エラー: ${error.message}`;
+    }
+
+    // Step 2: Rikuの結果から1商品目を抽出してKōki・Mimiに渡す
+    const rikuResult = results[0] || '';
+    const firstProductMatch = rikuResult.match(/①【商品名】(.+)/);
+    const firstPriceMatch = rikuResult.match(/②【価格帯】(.+)/);
+    const productInput = firstProductMatch
+      ? `${firstProductMatch[1].trim()}${firstPriceMatch ? ' ' + firstPriceMatch[1].trim() : ''}`
+      : keyword;
+
+    document.getElementById('input-1').value = productInput; // Kōki
+    document.getElementById('input-2').value = productInput; // Mimi
+    document.getElementById('input-3').value = keyword;      // Hoshi
+    document.getElementById('input-5').value = `${keyword} 今週分`; // Plan
+
+    // Step 3: 残りのエージェントを並列実行
+    await Promise.all([1, 2, 3, 5].map(async (index) => {
+      try {
+        results[index] = await runSingleAgent(index);
+      } catch (error) {
+        results[index] = `❌ エラー: ${error.message}`;
+      }
+    }));
+
+    // Step 4: Checkエージェントで品質審査
+    if (results[1] && results[2]) {
+      const checkInput = `【X投稿】\n${results[1]}\n\n【楽天ROOM投稿】\n${results[2]}`;
+      document.getElementById('input-4').value = checkInput;
+      try {
+        results[4] = await runSingleAgent(4);
+      } catch (error) {
+        results[4] = `❌ 審査エラー: ${error.message}`;
+      }
+    }
+
+    // Step 4: 統合レポート表示
+    showIntegratedReport(keyword, results);
+
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🚀 全エージェント起動';
+  }
+}
+
+// === シミュレーション実行 ===
+function runSimulation() {
+  const keyword = 'アウトドア・ガジェット（シミュレーション）';
+  
+  const mockResults = [
+    // Riku: 商品リサーチ
+    `①【商品名】YETI ランブラー タンブラー 30oz
+②【価格帯】5,500円
+③【おすすめポイント】真空二重構造で保温保冷性能が抜群。仕事中のコーヒーが最後まで温かい
+④【使用シーン】オフィス・アウトドア・車内
+⑤【楽天市場での人気度】アウトドアカテゴリ上位
+
+①【商品名】Anker PowerCore 10000
+②【価格帯】3,200円  
+③【おすすめポイント】コンパクトなのに大容量。出張の必需品
+④【使用シーン】出張・キャンプ・緊急時
+⑤【楽天市場での人気度】モバイルバッテリー売れ筋1位
+
+①【商品名】Coleman ツーリングドームST
+②【価格帯】15,800円
+③【おすすめポイント】設営簡単で初心者でも安心。家族キャンプデビューに最適
+④【使用シーン】ファミリーキャンプ・ソロキャンプ
+⑤【楽天市場での人気度】テントカテゴリ常連`,
+
+    // Kōki: X投稿
+    `キャンプ道具、また増やしてしもた😅
+
+YETIのタンブラー買ったんやけど、これがまた優秀すぎて...朝のコーヒーが昼過ぎまでアツアツのまま✨
+
+奥さんに「また無駄遣い？」って言われたけど、仕事の効率上がるから投資やで〜
+
+#キャンプ道具 #YETI #こだわりパパ`,
+
+    // Mimi: 楽天ROOM投稿  
+    `【投稿タイトル】40代パパが選んだ最強タンブラー
+【レビュー文】夫が「仕事用に」と言って買ってきたYETIのタンブラー。確かに保温性は抜群だけど、値段も結構するのが悩みどころ。でも長く使えそうだし、キャンプでも活躍してくれそう。
+【おすすめポイント】保温性抜群・デザインがカッコいい・耐久性高い
+【デメリット】価格が高め
+【タグ】#YETI #タンブラー #アウトドア #キャンプ道具 #保温 #楽天ROOM #パパライフ
+【推奨投稿時間】平日 20:00-22:00（パパの帰宅後）`,
+
+    // Hoshi: Threads占い
+    `🌟今日の運勢🌟
+
+♈牡羊座：新しい挑戦の日。アウトドア用品が幸運を呼ぶ
+♉牡牛座：安定を求める気持ちが強まる。お気に入りのギア探しを
+♊双子座：コミュニケーション運up。キャンプ仲間との時間を
+♋蟹座：家族との絆深まる。ファミリーキャンプの計画を
+♌獅子座：注目度アップ。かっこいいギアでみんなの視線独り占め
+♍乙女座：細かな準備が吉。キャンプ道具の点検をしてみて
+♎天秤座：バランス感覚が冴える。機能とデザインの両立したアイテムを
+♏蠍座：深く探求する日。こだわりのギア選びに時間をかけて
+♐射手座：冒険心旺盛。新しいキャンプ場開拓の準備を
+♑山羊座：実用性重視の判断。長く使える質の良いものを選んで
+♒水瓶座：個性を活かして。人とは違うユニークなギアに注目
+♓魚座：直感が冴える。ピンとくるアイテムとの出会いがありそう
+
+✨今日の開運アイテム✨
+【YETIタンブラー】頑丈で長持ち、男のロマンが詰まった一品
+
+#占い #今日の運勢 #開運 #楽天ROOM #アウトドア`,
+
+    // Check: 審査結果
+    `【審査結果】⭐⭐⭐⭐⭐（5段階評価）
+
+【良い点】
+・自然体な関西弁で親しみやすい
+・実体験に基づく説得力のある表現
+・家族とのやり取りで人柄が伝わる
+・押し売り感が全くない
+
+【改善点】
+・特になし。非常に良いバランス
+
+【修正提案】
+・現状維持でOK
+
+【推奨度】A（そのまま投稿推奨）`,
+
+    // Plan: 週間プラン  
+    `【今週のテーマ】アウトドア・ガジェット強化週間
+
+【投稿スケジュール】
+月曜：7:30 - 朝活投稿（X）新商品情報
+火曜：12:00 - ランチタイム（ROOM）タンブラー紹介  
+火曜：20:00 - 夜の占い投稿（Threads）
+水曜：19:00 - 夕方投稿（X）使用感レビュー
+木曜：12:00 - お昼投稿（ROOM）モバイルバッテリー
+金曜：7:30 - 朝投稿（X）週末キャンプ準備
+土曜：10:00 - 休日投稿（ROOM）テント紹介
+日曜：20:00 - まとめ投稿（X）今週の振り返り
+
+【重点商品カテゴリ】
+1. アウトドア用品（テント・タープ）
+2. ガジェット（モバイルバッテリー・ライト）  
+3. ドリンクウェア（タンブラー・水筒）
+
+【狙うハッシュタグ】
+#アウトドア #キャンプ道具 #ガジェット #楽天ROOM #こだわりパパ
+
+【注意事項・改善点】
+・平日昼間の投稿でサラリーマン層にアプローチ
+・週末はファミリー向けコンテンツ強化
+・Threadsは夜時間帯で占い需要を狙う`
+  ];
+
+  // シミュレーション結果を各エージェントに表示
+  mockResults.forEach((result, index) => {
+    const output = document.getElementById(`output-${index}`);
+    const status = document.getElementById(`status-${index}`);
+    const card = document.getElementById(`card-${index}`);
+    
+    output.className = 'output-area visible';
+    output.textContent = result;
+    card.className = 'agent-card success';
+    status.className = 'agent-status success';
+    status.textContent = '✅ 生成完了（シミュレーション）';
+  });
+
+  // 統合レポートも表示
+  showIntegratedReport(keyword, mockResults);
+}
+
+// === 統合レポート表示 ===
+function showIntegratedReport(keyword, results) {
+  const now = new Date();
+  const dateStr = `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  
+  const agentNames = [
+    '🔍 商品リサーチ（Riku）',
+    '✍️ X投稿文（Kōki）', 
+    '🏠 楽天ROOM投稿（Mimi）',
+    '⭐ Threads占い（Hoshi）',
+    '✅ 品質審査（Check）',
+    '📅 週間プラン（Plan）'
+  ];
+
+  let reportContent = `# 楽天ROOM AIエージェントチーム 統合レポート
+
+📅 生成日時：${dateStr}
+🎯 テーマ：${keyword}
+
+`;
+
+  results.forEach((result, index) => {
+    if (result) {
+      reportContent += `${'═'.repeat(50)}\n${agentNames[index]}\n${'═'.repeat(50)}\n${result}\n\n`;
+    }
+  });
+
+  reportContent += `
+${'═'.repeat(50)}
+📊 実行サマリー
+${'═'.repeat(50)}
+✅ 実行成功：${results.filter(r => r && !r.includes('❌')).length}/6 エージェント
+⚡ 実行時間：${dateStr}
+🎯 対象キーワード：${keyword}
+
+次のアクションプラン：
+1. X投稿文をコピーして投稿
+2. 楽天ROOM投稿を商品ページに設定
+3. Threads占い投稿をスケジュール
+4. 品質審査結果を参考に改善
+5. 週間プランに従って継続実行
+`;
+
+  document.getElementById('resultContent').textContent = reportContent;
+  document.getElementById('resultPanel').style.display = 'block';
+  document.getElementById('resultPanel').scrollIntoView({ behavior: 'smooth' });
+}
+
+// === コピー機能 ===
+function copyOutput(index, btn) {
+  const text = document.getElementById(`output-${index}`).textContent;
+  if (!text || text === '生成中...') return;
+  
+  navigator.clipboard.writeText(text).then(() => {
+    const originalText = btn.textContent;
+    btn.textContent = '✅ コピー済';
+    setTimeout(() => btn.textContent = originalText, 1500);
+  }).catch(() => {
+    alert('コピーに失敗しました');
+  });
+}
+
+function copyAllResults() {
+  const text = document.getElementById('resultContent').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    alert('📋 統合レポートをクリップボードにコピーしました！');
+  }).catch(() => {
+    alert('コピーに失敗しました');
+  });
+}
+
+function exportMarkdown() {
+  const text = document.getElementById('resultContent').textContent;
+  const blob = new Blob([text], { type: 'text/markdown' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `楽天ROOM_AIレポート_${new Date().toISOString().slice(0, 10)}.md`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// === クリア機能 ===
+function clearAll() {
+  for (let i = 0; i < 6; i++) {
+    const output = document.getElementById(`output-${i}`);
+    const status = document.getElementById(`status-${i}`);
+    const card = document.getElementById(`card-${i}`);
+    
+    output.textContent = '';
+    output.className = 'output-area';
+    status.textContent = '';
+    status.className = 'agent-status';
+    card.className = 'agent-card';
+  }
+  document.getElementById('resultPanel').style.display = 'none';
+}
+
+// === 初期化 ===
+window.onload = function() {
+  const savedKey = localStorage.getItem('claude_api_key');
+  if (savedKey) {
+    document.getElementById('apiInputSection').style.display = 'none';
+    document.getElementById('apiSavedSection').style.display = 'flex';
+  }
+  console.log('🤖 楽天ROOM AIエージェントチーム v3.0 Ready!');
+};
 </script>
 </body>
 </html>
